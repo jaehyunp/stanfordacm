@@ -1,0 +1,3143 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Stanford University ACM Team Notebook (2013-14)</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#1F00FF" ALINK="#FF0000" VLINK="#9900DD">
+<A NAME="top">
+<CENTER><H1><U>Stanford University ACM Team Notebook (2013-14)</U></H1></CENTER>
+<H1>Table of Contents</H1>
+<H2>Combinatorial optimization</H2>
+
+<OL START=1>
+<LI><A HREF="#file1">Sparse max-flow (C++)</A></LI>
+<LI><A HREF="#file2">Min-cost max-flow (C++)</A></LI>
+<LI><A HREF="#file3">Push-relabel max-flow (C++)</A></LI>
+<LI><A HREF="#file4">Min-cost matching (C++)</A></LI>
+<LI><A HREF="#file5">Max bipartite matching (C++)</A></LI>
+<LI><A HREF="#file6">Global min cut (C++)</A></LI>
+<LI><A HREF="#file7">Graph cut inference (C++)</A></LI>
+</OL>
+<H2>Geometry</H2>
+
+<OL START=8>
+<LI><A HREF="#file8">Convex hull (C++)</A></LI>
+<LI><A HREF="#file9">Miscellaneous geometry (C++)</A></LI>
+<LI><A HREF="#file10">Java geometry (Java)</A></LI>
+<LI><A HREF="#file11">3D geometry (Java)</A></LI>
+<LI><A HREF="#file12">Slow Delaunay triangulation (C++)</A></LI>
+</OL>
+<H2>Numerical algorithms</H2>
+
+<OL START=13>
+<LI><A HREF="#file13">Number theoretic algorithms (modular, Chinese remainder, linear Diophantine) (C++)</A></LI>
+<LI><A HREF="#file14">Systems of linear equations, matrix inverse, determinant (C++)</A></LI>
+<LI><A HREF="#file15">Reduced row echelon form, matrix rank (C++)</A></LI>
+<LI><A HREF="#file16">Fast Fourier transform (C++)</A></LI>
+<LI><A HREF="#file17">Simplex algorithm (C++)</A></LI>
+</OL>
+<H2>Graph algorithms</H2>
+
+<OL START=18>
+<LI><A HREF="#file18">Fast Dijkstra's algorithm (C++)</A></LI>
+<LI><A HREF="#file19">Strongly connected components (C)</A></LI>
+<LI><A HREF="#file20">Eulerian Path (C++)</A></LI>
+</OL>
+<H2>Data structures</H2>
+
+<OL START=21>
+<LI><A HREF="#file21">Suffix arrays (C++)</A></LI>
+<LI><A HREF="#file22">Binary Indexed Tree</A></LI>
+<LI><A HREF="#file23">Union-Find Set (C/C++)</A></LI>
+<LI><A HREF="#file24">KD-tree (C++)</A></LI>
+<LI><A HREF="#file25">Lazy Segment Tree (Java)</A></LI>
+<LI><A HREF="#file26">Lowest Common Ancestor (C++)</A></LI>
+</OL>
+<H2>Miscellaneous</H2>
+
+<OL START=27>
+<LI><A HREF="#file27">Longest increasing subsequence (C++)</A></LI>
+<LI><A HREF="#file28">Dates (C++)</A></LI>
+<LI><A HREF="#file29">Regular expressions (Java)</A></LI>
+<LI><A HREF="#file30">Prime numbers (C++)</A></LI>
+<LI><A HREF="#file31">C++ input/output</A></LI>
+<LI><A HREF="#file32">Knuth-Morris-Pratt (C++)</A></LI>
+<LI><A HREF="#file33">Latitude/longitude</A></LI>
+<LI><A HREF="#file34">Emacs settings</A></LI>
+</OL>
+<HR>
+<A NAME="file1">
+<H1>Dinic.cc 1/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Adjacency list implementation of Dinic's blocking flow algorithm.
+</FONT></I><I><FONT COLOR="#B22222">// This is very fast in practice, and only loses to push-relabel flow.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time:
+</FONT></I><I><FONT COLOR="#B22222">//     O(|V|^2 |E|)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: 
+</FONT></I><I><FONT COLOR="#B22222">//     - graph, constructed using AddEdge()
+</FONT></I><I><FONT COLOR="#B22222">//     - source
+</FONT></I><I><FONT COLOR="#B22222">//     - sink
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:
+</FONT></I><I><FONT COLOR="#B22222">//     - maximum flow value
+</FONT></I><I><FONT COLOR="#B22222">//     - To obtain the actual flow values, look at all edges with
+</FONT></I><I><FONT COLOR="#B22222">//       capacity &gt; 0 (zero capacity edges are residual edges).
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;queue&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> INF = 2000000000;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> Edge {
+  <FONT COLOR="#228B22"><B>int</FONT></B> from, to, cap, flow, index;
+  Edge(<FONT COLOR="#228B22"><B>int</FONT></B> from, <FONT COLOR="#228B22"><B>int</FONT></B> to, <FONT COLOR="#228B22"><B>int</FONT></B> cap, <FONT COLOR="#228B22"><B>int</FONT></B> flow, <FONT COLOR="#228B22"><B>int</FONT></B> index) :
+    from(from), to(to), cap(cap), flow(flow), index(index) {}
+};
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> Dinic {
+  <FONT COLOR="#228B22"><B>int</FONT></B> N;
+  vector&lt;vector&lt;Edge&gt; &gt; G;
+  vector&lt;Edge *&gt; dad;
+  vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; Q;
+  
+  Dinic(<FONT COLOR="#228B22"><B>int</FONT></B> N) : N(N), G(N), dad(N), Q(N) {}
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> AddEdge(<FONT COLOR="#228B22"><B>int</FONT></B> from, <FONT COLOR="#228B22"><B>int</FONT></B> to, <FONT COLOR="#228B22"><B>int</FONT></B> cap) {
+    G[from].push_back(Edge(from, to, cap, 0, G[to].size()));
+    <B><FONT COLOR="#A020F0">if</FONT></B> (from == to) G[from].back().index++;
+    G[to].push_back(Edge(to, from, 0, 0, G[from].size() - 1));
+  }
+
+  <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> BlockingFlow(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    fill(dad.begin(), dad.end(), (Edge *) NULL);
+    dad[s] = &amp;G[0][0] - 1;
+    
+    <FONT COLOR="#228B22"><B>int</FONT></B> head = 0, tail = 0;
+    Q[tail++] = s;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (head &lt; tail) {
+      <FONT COLOR="#228B22"><B>int</FONT></B> x = Q[head++];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; G[x].size(); i++) {
+	Edge &amp;e = G[x][i];
+	<B><FONT COLOR="#A020F0">if</FONT></B> (!dad[e.to] &amp;&amp; e.cap - e.flow &gt; 0) {
+	  dad[e.to] = &amp;G[x][i];
+	  Q[tail++] = e.to;
+	}
+      }
+    }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!dad[t]) <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+
+    <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> totflow = 0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; G[t].size(); i++) {
+      Edge *start = &amp;G[G[t][i].to][G[t][i].index];
+      <FONT COLOR="#228B22"><B>int</FONT></B> amt = INF;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (Edge *e = start; amt &amp;&amp; e != dad[s]; e = dad[e-&gt;from]) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (!e) { amt = 0; <B><FONT COLOR="#A020F0">break</FONT></B>; }
+	amt = min(amt, e-&gt;cap - e-&gt;flow);
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (amt == 0) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (Edge *e = start; amt &amp;&amp; e != dad[s]; e = dad[e-&gt;from]) {
+	e-&gt;flow += amt;
+	G[e-&gt;to][e-&gt;index].flow -= amt;
+      }
+      totflow += amt;
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+  }
+
+  <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> GetMaxFlow(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> totflow = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (<FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> flow = BlockingFlow(s, t))
+      totflow += flow;
+    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+  }
+};
+
+</PRE>
+<HR>
+<A NAME="file2">
+<H1>MinCostMaxFlow.cc 2/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Implementation of min cost max flow algorithm using adjacency
+</FONT></I><I><FONT COLOR="#B22222">// matrix (Edmonds and Karp 1972).  This implementation keeps track of
+</FONT></I><I><FONT COLOR="#B22222">// forward and reverse edges separately (so you can set cap[i][j] !=
+</FONT></I><I><FONT COLOR="#B22222">// cap[j][i]).  For a regular max flow, set all edge costs to 0.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time, O(|V|^2) cost per augmentation
+</FONT></I><I><FONT COLOR="#B22222">//     max flow:           O(|V|^3) augmentations
+</FONT></I><I><FONT COLOR="#B22222">//     min cost max flow:  O(|V|^4 * MAX_EDGE_COST) augmentations
+</FONT></I><I><FONT COLOR="#B22222">//     
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: 
+</FONT></I><I><FONT COLOR="#B22222">//     - graph, constructed using AddEdge()
+</FONT></I><I><FONT COLOR="#B22222">//     - source
+</FONT></I><I><FONT COLOR="#B22222">//     - sink
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:
+</FONT></I><I><FONT COLOR="#B22222">//     - (maximum flow value, minimum cost value)
+</FONT></I><I><FONT COLOR="#B22222">//     - To obtain the actual flow, look at positive values only.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VI&gt; VVI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> L;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;L&gt; VL;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VL&gt; VVL;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>, <FONT COLOR="#228B22"><B>int</FONT></B>&gt; PII;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;PII&gt; VPII;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> L INF = numeric_limits&lt;L&gt;::max() / 4;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> MinCostMaxFlow {
+  <FONT COLOR="#228B22"><B>int</FONT></B> N;
+  VVL cap, flow, cost;
+  VI found;
+  VL dist, pi, width;
+  VPII dad;
+
+  MinCostMaxFlow(<FONT COLOR="#228B22"><B>int</FONT></B> N) : 
+    N(N), cap(N, VL(N)), flow(N, VL(N)), cost(N, VL(N)), 
+    found(N), dist(N), pi(N), width(N), dad(N) {}
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> AddEdge(<FONT COLOR="#228B22"><B>int</FONT></B> from, <FONT COLOR="#228B22"><B>int</FONT></B> to, L cap, L cost) {
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;cap[from][to] = cap;
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;cost[from][to] = cost;
+  }
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> Relax(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> k, L cap, L cost, <FONT COLOR="#228B22"><B>int</FONT></B> dir) {
+    L val = dist[s] + pi[s] - pi[k] + cost;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (cap &amp;&amp; val &lt; dist[k]) {
+      dist[k] = val;
+      dad[k] = make_pair(s, dir);
+      width[k] = min(cap, width[s]);
+    }
+  }
+
+  L Dijkstra(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    fill(found.begin(), found.end(), false);
+    fill(dist.begin(), dist.end(), INF);
+    fill(width.begin(), width.end(), 0);
+    dist[s] = 0;
+    width[s] = INF;
+    
+    <B><FONT COLOR="#A020F0">while</FONT></B> (s != -1) {
+      <FONT COLOR="#228B22"><B>int</FONT></B> best = -1;
+      found[s] = true;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; N; k++) {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (found[k]) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+        Relax(s, k, cap[s][k] - flow[s][k], cost[s][k], 1);
+        Relax(s, k, flow[k][s], -cost[k][s], -1);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (best == -1 || dist[k] &lt; dist[best]) best = k;
+      }
+      s = best;
+    }
+
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; N; k++)
+      pi[k] = min(pi[k] + dist[k], INF);
+    <B><FONT COLOR="#A020F0">return</FONT></B> width[t];
+  }
+
+  pair&lt;L, L&gt; GetMaxFlow(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    L totflow = 0, totcost = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (L amt = Dijkstra(s, t)) {
+      totflow += amt;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> x = t; x != s; x = dad[x].first) {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (dad[x].second == 1) {
+          flow[dad[x].first][x] += amt;
+          totcost += amt * cost[dad[x].first][x];
+        } <B><FONT COLOR="#A020F0">else</FONT></B> {
+          flow[x][dad[x].first] -= amt;
+          totcost -= amt * cost[x][dad[x].first];
+        }
+      }
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(totflow, totcost);
+  }
+};
+
+</PRE>
+<HR>
+<A NAME="file3">
+<H1>PushRelabel.cc 3/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Adjacency list implementation of FIFO push relabel maximum flow
+</FONT></I><I><FONT COLOR="#B22222">// with the gap relabeling heuristic.  This implementation is
+</FONT></I><I><FONT COLOR="#B22222">// significantly faster than straight Ford-Fulkerson.  It solves
+</FONT></I><I><FONT COLOR="#B22222">// random problems with 10000 vertices and 1000000 edges in a few
+</FONT></I><I><FONT COLOR="#B22222">// seconds, though it is possible to construct test cases that
+</FONT></I><I><FONT COLOR="#B22222">// achieve the worst-case.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time:
+</FONT></I><I><FONT COLOR="#B22222">//     O(|V|^3)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: 
+</FONT></I><I><FONT COLOR="#B22222">//     - graph, constructed using AddEdge()
+</FONT></I><I><FONT COLOR="#B22222">//     - source
+</FONT></I><I><FONT COLOR="#B22222">//     - sink
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:
+</FONT></I><I><FONT COLOR="#B22222">//     - maximum flow value
+</FONT></I><I><FONT COLOR="#B22222">//     - To obtain the actual flow values, look at all edges with
+</FONT></I><I><FONT COLOR="#B22222">//       capacity &gt; 0 (zero capacity edges are residual edges).
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;queue&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> LL;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> Edge {
+  <FONT COLOR="#228B22"><B>int</FONT></B> from, to, cap, flow, index;
+  Edge(<FONT COLOR="#228B22"><B>int</FONT></B> from, <FONT COLOR="#228B22"><B>int</FONT></B> to, <FONT COLOR="#228B22"><B>int</FONT></B> cap, <FONT COLOR="#228B22"><B>int</FONT></B> flow, <FONT COLOR="#228B22"><B>int</FONT></B> index) :
+    from(from), to(to), cap(cap), flow(flow), index(index) {}
+};
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> PushRelabel {
+  <FONT COLOR="#228B22"><B>int</FONT></B> N;
+  vector&lt;vector&lt;Edge&gt; &gt; G;
+  vector&lt;LL&gt; excess;
+  vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; dist, active, count;
+  queue&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; Q;
+
+  PushRelabel(<FONT COLOR="#228B22"><B>int</FONT></B> N) : N(N), G(N), excess(N), dist(N), active(N), count(2*N) {}
+
+  <FONT COLOR="#228B22"><B>void</FONT></B> AddEdge(<FONT COLOR="#228B22"><B>int</FONT></B> from, <FONT COLOR="#228B22"><B>int</FONT></B> to, <FONT COLOR="#228B22"><B>int</FONT></B> cap) {
+    G[from].push_back(Edge(from, to, cap, 0, G[to].size()));
+    <B><FONT COLOR="#A020F0">if</FONT></B> (from == to) G[from].back().index++;
+    G[to].push_back(Edge(to, from, 0, 0, G[from].size() - 1));
+  }
+
+  <FONT COLOR="#228B22"><B>void</FONT></B> Enqueue(<FONT COLOR="#228B22"><B>int</FONT></B> v) { 
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!active[v] &amp;&amp; excess[v] &gt; 0) { active[v] = true; Q.push(v); } 
+  }
+
+  <FONT COLOR="#228B22"><B>void</FONT></B> Push(Edge &amp;e) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> amt = <FONT COLOR="#228B22"><B>int</FONT></B>(min(excess[e.from], LL(e.cap - e.flow)));
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dist[e.from] &lt;= dist[e.to] || amt == 0) <B><FONT COLOR="#A020F0">return</FONT></B>;
+    e.flow += amt;
+    G[e.to][e.index].flow -= amt;
+    excess[e.to] += amt;    
+    excess[e.from] -= amt;
+    Enqueue(e.to);
+  }
+  
+  <FONT COLOR="#228B22"><B>void</FONT></B> Gap(<FONT COLOR="#228B22"><B>int</FONT></B> k) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> v = 0; v &lt; N; v++) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (dist[v] &lt; k) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      count[dist[v]]--;
+      dist[v] = max(dist[v], N+1);
+      count[dist[v]]++;
+      Enqueue(v);
+    }
+  }
+
+  <FONT COLOR="#228B22"><B>void</FONT></B> Relabel(<FONT COLOR="#228B22"><B>int</FONT></B> v) {
+    count[dist[v]]--;
+    dist[v] = 2*N;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; G[v].size(); i++) 
+      <B><FONT COLOR="#A020F0">if</FONT></B> (G[v][i].cap - G[v][i].flow &gt; 0)
+	dist[v] = min(dist[v], dist[G[v][i].to] + 1);
+    count[dist[v]]++;
+    Enqueue(v);
+  }
+
+  <FONT COLOR="#228B22"><B>void</FONT></B> Discharge(<FONT COLOR="#228B22"><B>int</FONT></B> v) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; excess[v] &gt; 0 &amp;&amp; i &lt; G[v].size(); i++) Push(G[v][i]);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (excess[v] &gt; 0) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (count[dist[v]] == 1) 
+	Gap(dist[v]); 
+      <B><FONT COLOR="#A020F0">else</FONT></B>
+	Relabel(v);
+    }
+  }
+
+  LL GetMaxFlow(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    count[0] = N-1;
+    count[N] = 1;
+    dist[s] = N;
+    active[s] = active[t] = true;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; G[s].size(); i++) {
+      excess[s] += G[s][i].cap;
+      Push(G[s][i]);
+    }
+    
+    <B><FONT COLOR="#A020F0">while</FONT></B> (!Q.empty()) {
+      <FONT COLOR="#228B22"><B>int</FONT></B> v = Q.front();
+      Q.pop();
+      active[v] = false;
+      Discharge(v);
+    }
+    
+    LL totflow = 0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; G[s].size(); i++) totflow += G[s][i].flow;
+    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+  }
+};
+
+</PRE>
+<HR>
+<A NAME="file4">
+<H1>MinCostMatching.cc 4/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">///////////////////////////////////////////////////////////////////////////
+</FONT></I><I><FONT COLOR="#B22222">// Min cost bipartite matching via shortest augmenting paths
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// This is an O(n^3) implementation of a shortest augmenting path
+</FONT></I><I><FONT COLOR="#B22222">// algorithm for finding min cost perfect matchings in dense
+</FONT></I><I><FONT COLOR="#B22222">// graphs.  In practice, it solves 1000x1000 problems in around 1
+</FONT></I><I><FONT COLOR="#B22222">// second.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   cost[i][j] = cost for pairing left node i with right node j
+</FONT></I><I><FONT COLOR="#B22222">//   Lmate[i] = index of right node that left node i pairs with
+</FONT></I><I><FONT COLOR="#B22222">//   Rmate[j] = index of left node that right node j pairs with
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// The values in cost[i][j] may be positive or negative.  To perform
+</FONT></I><I><FONT COLOR="#B22222">// maximization, simply negate the cost[][] matrix.
+</FONT></I><I><FONT COLOR="#B22222">///////////////////////////////////////////////////////////////////////////
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;algorithm&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cstdio&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>double</FONT></B>&gt; VD;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VD&gt; VVD;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+
+<FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">MinCostMatching</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> VVD &amp;cost, VI &amp;Lmate, VI &amp;Rmate) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> n = <FONT COLOR="#228B22"><B>int</FONT></B>(cost.size());
+
+  <I><FONT COLOR="#B22222">// construct dual feasible solution
+</FONT></I>  VD u(n);
+  VD v(n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    u[i] = cost[i][0];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 1; j &lt; n; j++) u[i] = min(u[i], cost[i][j]);
+  }
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++) {
+    v[j] = cost[0][j] - u[0];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 1; i &lt; n; i++) v[j] = min(v[j], cost[i][j] - u[i]);
+  }
+  
+  <I><FONT COLOR="#B22222">// construct primal solution satisfying complementary slackness
+</FONT></I>  Lmate = VI(n, -1);
+  Rmate = VI(n, -1);
+  <FONT COLOR="#228B22"><B>int</FONT></B> mated = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (Rmate[j] != -1) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(cost[i][j] - u[i] - v[j]) &lt; 1e-10) {
+	Lmate[i] = j;
+	Rmate[j] = i;
+	mated++;
+	<B><FONT COLOR="#A020F0">break</FONT></B>;
+      }
+    }
+  }
+  
+  VD dist(n);
+  VI dad(n);
+  VI seen(n);
+  
+  <I><FONT COLOR="#B22222">// repeat until primal solution is feasible
+</FONT></I>  <B><FONT COLOR="#A020F0">while</FONT></B> (mated &lt; n) {
+    
+    <I><FONT COLOR="#B22222">// find an unmatched left node
+</FONT></I>    <FONT COLOR="#228B22"><B>int</FONT></B> s = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (Lmate[s] != -1) s++;
+    
+    <I><FONT COLOR="#B22222">// initialize Dijkstra
+</FONT></I>    fill(dad.begin(), dad.end(), -1);
+    fill(seen.begin(), seen.end(), 0);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) 
+      dist[k] = cost[s][k] - u[s] - v[k];
+    
+    <FONT COLOR="#228B22"><B>int</FONT></B> j = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (true) {
+      
+      <I><FONT COLOR="#B22222">// find closest
+</FONT></I>      j = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (seen[k]) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+	<B><FONT COLOR="#A020F0">if</FONT></B> (j == -1 || dist[k] &lt; dist[j]) j = k;
+      }
+      seen[j] = 1;
+      
+      <I><FONT COLOR="#B22222">// termination condition
+</FONT></I>      <B><FONT COLOR="#A020F0">if</FONT></B> (Rmate[j] == -1) <B><FONT COLOR="#A020F0">break</FONT></B>;
+      
+      <I><FONT COLOR="#B22222">// relax neighbors
+</FONT></I>      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i = Rmate[j];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (seen[k]) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+	<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> new_dist = dist[j] + cost[i][k] - u[i] - v[k];
+	<B><FONT COLOR="#A020F0">if</FONT></B> (dist[k] &gt; new_dist) {
+	  dist[k] = new_dist;
+	  dad[k] = j;
+	}
+      }
+    }
+    
+    <I><FONT COLOR="#B22222">// update dual variables
+</FONT></I>    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (k == j || !seen[k]) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> i = Rmate[k];
+      v[k] += dist[k] - dist[j];
+      u[i] -= dist[k] - dist[j];
+    }
+    u[s] += dist[j];
+    
+    <I><FONT COLOR="#B22222">// augment along path
+</FONT></I>    <B><FONT COLOR="#A020F0">while</FONT></B> (dad[j] &gt;= 0) {
+      <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> d = dad[j];
+      Rmate[j] = Rmate[d];
+      Lmate[Rmate[j]] = j;
+      j = d;
+    }
+    Rmate[j] = s;
+    Lmate[s] = j;
+    
+    mated++;
+  }
+  
+  <FONT COLOR="#228B22"><B>double</FONT></B> value = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++)
+    value += cost[i][Lmate[i]];
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> value;
+}
+</PRE>
+<HR>
+<A NAME="file5">
+<H1>MaxBipartiteMatching.cc 5/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// This code performs maximum bipartite matching.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(|E| |V|) -- often much faster in practice
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   INPUT: w[i][j] = edge between row node i and column node j
+</FONT></I><I><FONT COLOR="#B22222">//   OUTPUT: mr[i] = assignment for row node i, -1 if unassigned
+</FONT></I><I><FONT COLOR="#B22222">//           mc[j] = assignment for column node j, -1 if unassigned
+</FONT></I><I><FONT COLOR="#B22222">//           function returns number of matches made
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VI&gt; VVI;
+
+<FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">FindMatch</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i, <FONT COLOR="#228B22"><B>const</FONT></B> VVI &amp;w, VI &amp;mr, VI &amp;mc, VI &amp;seen) {
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; w[i].size(); j++) {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (w[i][j] &amp;&amp; !seen[j]) {
+      seen[j] = true;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (mc[j] &lt; 0 || FindMatch(mc[j], w, mr, mc, seen)) {
+        mr[i] = j;
+        mc[j] = i;
+        <B><FONT COLOR="#A020F0">return</FONT></B> true;
+      }
+    }
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> false;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">BipartiteMatching</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> VVI &amp;w, VI &amp;mr, VI &amp;mc) {
+  mr = VI(w.size(), -1);
+  mc = VI(w[0].size(), -1);
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> ct = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; w.size(); i++) {
+    VI seen(w[0].size());
+    <B><FONT COLOR="#A020F0">if</FONT></B> (FindMatch(i, w, mr, mc, seen)) ct++;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> ct;
+}
+</PRE>
+<HR>
+<A NAME="file6">
+<H1>MinCut.cc 6/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Adjacency matrix implementation of Stoer-Wagner min cut algorithm.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time:
+</FONT></I><I><FONT COLOR="#B22222">//     O(|V|^3)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: 
+</FONT></I><I><FONT COLOR="#B22222">//     - graph, constructed using AddEdge()
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:
+</FONT></I><I><FONT COLOR="#B22222">//     - (min cut value, nodes in half of min cut)
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VI&gt; VVI;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> INF = 1000000000;
+
+pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>, VI&gt; GetMinCut(VVI &amp;weights) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> N = weights.size();
+  VI used(N), cut, best_cut;
+  <FONT COLOR="#228B22"><B>int</FONT></B> best_weight = -1;
+  
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> phase = N-1; phase &gt;= 0; phase--) {
+    VI w = weights[0];
+    VI added = used;
+    <FONT COLOR="#228B22"><B>int</FONT></B> prev, last = 0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; phase; i++) {
+      prev = last;
+      last = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 1; j &lt; N; j++)
+	<B><FONT COLOR="#A020F0">if</FONT></B> (!added[j] &amp;&amp; (last == -1 || w[j] &gt; w[last])) last = j;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (i == phase-1) {
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; N; j++) weights[prev][j] += weights[last][j];
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; N; j++) weights[j][prev] = weights[prev][j];
+	used[last] = true;
+	cut.push_back(last);
+	<B><FONT COLOR="#A020F0">if</FONT></B> (best_weight == -1 || w[last] &lt; best_weight) {
+	  best_cut = cut;
+	  best_weight = w[last];
+	}
+      } <B><FONT COLOR="#A020F0">else</FONT></B> {
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; N; j++)
+	  w[j] += weights[last][j];
+	added[last] = true;
+      }
+    }
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(best_weight, best_cut);
+}
+
+</PRE>
+<HR>
+<A NAME="file7">
+<H1>GraphCutInference.cc 7/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Special-purpose {0,1} combinatorial optimization solver for
+</FONT></I><I><FONT COLOR="#B22222">// problems of the following by a reduction to graph cuts:
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//        minimize         sum_i  psi_i(x[i]) 
+</FONT></I><I><FONT COLOR="#B22222">//  x[1]...x[n] in {0,1}      + sum_{i &lt; j}  phi_{ij}(x[i], x[j])
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// where
+</FONT></I><I><FONT COLOR="#B22222">//      psi_i : {0, 1} --&gt; R
+</FONT></I><I><FONT COLOR="#B22222">//   phi_{ij} : {0, 1} x {0, 1} --&gt; R
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// such that
+</FONT></I><I><FONT COLOR="#B22222">//   phi_{ij}(0,0) + phi_{ij}(1,1) &lt;= phi_{ij}(0,1) + phi_{ij}(1,0)  (*)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// This can also be used to solve maximization problems where the
+</FONT></I><I><FONT COLOR="#B22222">// direction of the inequality in (*) is reversed.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: phi -- a matrix such that phi[i][j][u][v] = phi_{ij}(u, v)
+</FONT></I><I><FONT COLOR="#B22222">//        psi -- a matrix such that psi[i][u] = psi_i(u)
+</FONT></I><I><FONT COLOR="#B22222">//        x -- a vector where the optimal solution will be stored
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT: value of the optimal solution
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// To use this code, create a GraphCutInference object, and call the
+</FONT></I><I><FONT COLOR="#B22222">// DoInference() method.  To perform maximization instead of minimization,
+</FONT></I><I><FONT COLOR="#B22222">// ensure that #define MAXIMIZATION is enabled.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VI&gt; VVI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VVI&gt; VVVI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VVVI&gt; VVVVI;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> INF = 1000000000;
+
+<I><FONT COLOR="#B22222">// comment out following line for minimization
+</FONT></I>#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">MAXIMIZATION</FONT>
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> GraphCutInference {
+  <FONT COLOR="#228B22"><B>int</FONT></B> N;
+  VVI cap, flow;
+  VI reached;
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> Augment(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t, <FONT COLOR="#228B22"><B>int</FONT></B> a) {
+    reached[s] = 1;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (s == t) <B><FONT COLOR="#A020F0">return</FONT></B> a; 
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; N; k++) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (reached[k]) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> aa = min(a, cap[s][k] - flow[s][k])) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> b = Augment(k, t, aa)) {
+	  flow[s][k] += b;
+	  flow[k][s] -= b;
+	  <B><FONT COLOR="#A020F0">return</FONT></B> b;
+	}
+      }
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> GetMaxFlow(<FONT COLOR="#228B22"><B>int</FONT></B> s, <FONT COLOR="#228B22"><B>int</FONT></B> t) {
+    N = cap.size();
+    flow = VVI(N, VI(N));
+    reached = VI(N);
+    
+    <FONT COLOR="#228B22"><B>int</FONT></B> totflow = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> amt = Augment(s, t, INF)) {
+      totflow += amt;
+      fill(reached.begin(), reached.end(), 0);
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+  }
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> DoInference(<FONT COLOR="#228B22"><B>const</FONT></B> VVVVI &amp;phi, <FONT COLOR="#228B22"><B>const</FONT></B> VVI &amp;psi, VI &amp;x) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> M = phi.size();
+    cap = VVI(M+2, VI(M+2));
+    VI b(M);
+    <FONT COLOR="#228B22"><B>int</FONT></B> c = 0;
+
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; M; i++) {
+      b[i] += psi[i][1] - psi[i][0];
+      c += psi[i][0];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; i; j++)
+	b[i] += phi[i][j][1][1] - phi[i][j][0][1];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = i+1; j &lt; M; j++) {
+	cap[i][j] = phi[i][j][0][1] + phi[i][j][1][0] - phi[i][j][0][0] - phi[i][j][1][1];
+	b[i] += phi[i][j][1][0] - phi[i][j][0][0];
+	c += phi[i][j][0][0];
+      }
+    }
+    
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">MAXIMIZATION</FONT>
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; M; i++) {
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = i+1; j &lt; M; j++) 
+	cap[i][j] *= -1;
+      b[i] *= -1;
+    }
+    c *= -1;
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; M; i++) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (b[i] &gt;= 0) {
+	cap[M][i] = b[i];
+      } <B><FONT COLOR="#A020F0">else</FONT></B> {
+	cap[i][M+1] = -b[i];
+	c += b[i];
+      }
+    }
+
+    <FONT COLOR="#228B22"><B>int</FONT></B> score = GetMaxFlow(M, M+1);
+    fill(reached.begin(), reached.end(), 0);
+    Augment(M, M+1, INF);
+    x = VI(M);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; M; i++) x[i] = reached[i] ? 0 : 1;
+    score += c;
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">MAXIMIZATION</FONT>
+    score *= -1;
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+
+    <B><FONT COLOR="#A020F0">return</FONT></B> score;
+  }
+
+};
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+
+  <I><FONT COLOR="#B22222">// solver for &quot;Cat vs. Dog&quot; from NWERC 2008
+</FONT></I>  
+  <FONT COLOR="#228B22"><B>int</FONT></B> numcases;
+  cin &gt;&gt; numcases;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> caseno = 0; caseno &lt; numcases; caseno++) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> c, d, v;
+    cin &gt;&gt; c &gt;&gt; d &gt;&gt; v;
+
+    VVVVI phi(c+d, VVVI(c+d, VVI(2, VI(2))));
+    VVI psi(c+d, VI(2));
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; v; i++) {
+      <FONT COLOR="#228B22"><B>char</FONT></B> p, q;
+      <FONT COLOR="#228B22"><B>int</FONT></B> u, v;
+      cin &gt;&gt; p &gt;&gt; u &gt;&gt; q &gt;&gt; v;
+      u--; v--;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (p == <FONT COLOR="#BC8F8F"><B>'C'</FONT></B>) {
+	phi[u][c+v][0][0]++;
+	phi[c+v][u][0][0]++;
+      } <B><FONT COLOR="#A020F0">else</FONT></B> {
+	phi[v][c+u][1][1]++;
+	phi[c+u][v][1][1]++;
+      }
+    }
+    
+    GraphCutInference graph;
+    VI x;
+    cout &lt;&lt; graph.DoInference(phi, psi, x) &lt;&lt; endl;
+  }
+
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file8">
+<H1>ConvexHull.cc 8/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Compute the 2D convex hull of a set of points using the monotone chain
+</FONT></I><I><FONT COLOR="#B22222">// algorithm.  Eliminate redundant points from the hull if REMOVE_REDUNDANT is 
+</FONT></I><I><FONT COLOR="#B22222">// #defined.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n log n)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   INPUT:   a vector of input points, unordered.
+</FONT></I><I><FONT COLOR="#B22222">//   OUTPUT:  a vector of points in the convex hull, counterclockwise, starting
+</FONT></I><I><FONT COLOR="#B22222">//            with bottommost/leftmost point
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cstdio&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cassert&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;algorithm&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+
+using namespace std;
+
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">REMOVE_REDUNDANT</FONT>
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> T;
+<FONT COLOR="#228B22"><B>const</FONT></B> T EPS = 1e-7;
+<FONT COLOR="#228B22"><B>struct</FONT></B> PT { 
+  T x, y; 
+  PT() {} 
+  PT(T x, T y) : x(x), y(y) {}
+  <FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>&lt;(<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;rhs) <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(y,x) &lt; make_pair(rhs.y,rhs.x); }
+  <FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>==(<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;rhs) <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(y,x) == make_pair(rhs.y,rhs.x); }
+};
+
+T cross(PT p, PT q) { <B><FONT COLOR="#A020F0">return</FONT></B> p.x*q.y-p.y*q.x; }
+T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b) + cross(b,c) + cross(c,a); }
+
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">REMOVE_REDUNDANT</FONT>
+<FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">between</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;a, <FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;b, <FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;c) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> (fabs(area2(a,b,c)) &lt; EPS &amp;&amp; (a.x-b.x)*(c.x-b.x) &lt;= 0 &amp;&amp; (a.y-b.y)*(c.y-b.y) &lt;= 0);
+}
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">ConvexHull</FONT></B>(vector&lt;PT&gt; &amp;pts) {
+  sort(pts.begin(), pts.end());
+  pts.erase(unique(pts.begin(), pts.end()), pts.end());
+  vector&lt;PT&gt; up, dn;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; pts.size(); i++) {
+    <B><FONT COLOR="#A020F0">while</FONT></B> (up.size() &gt; 1 &amp;&amp; area2(up[up.size()-2], up.back(), pts[i]) &gt;= 0) up.pop_back();
+    <B><FONT COLOR="#A020F0">while</FONT></B> (dn.size() &gt; 1 &amp;&amp; area2(dn[dn.size()-2], dn.back(), pts[i]) &lt;= 0) dn.pop_back();
+    up.push_back(pts[i]);
+    dn.push_back(pts[i]);
+  }
+  pts = dn;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = (<FONT COLOR="#228B22"><B>int</FONT></B>) up.size() - 2; i &gt;= 1; i--) pts.push_back(up[i]);
+  
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">REMOVE_REDUNDANT</FONT>
+  <B><FONT COLOR="#A020F0">if</FONT></B> (pts.size() &lt;= 2) <B><FONT COLOR="#A020F0">return</FONT></B>;
+  dn.clear();
+  dn.push_back(pts[0]);
+  dn.push_back(pts[1]);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 2; i &lt; pts.size(); i++) {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (between(dn[dn.size()-2], dn[dn.size()-1], pts[i])) dn.pop_back();
+    dn.push_back(pts[i]);
+  }
+  <B><FONT COLOR="#A020F0">if</FONT></B> (dn.size() &gt;= 3 &amp;&amp; between(dn.back(), dn[0], dn[1])) {
+    dn[0] = dn.back();
+    dn.pop_back();
+  }
+  pts = dn;
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+}
+
+</PRE>
+<HR>
+<A NAME="file9">
+<H1>Geometry.cc 9/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// C++ routines for computational geometry.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cassert&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>double</FONT></B> INF = 1e100;
+<FONT COLOR="#228B22"><B>double</FONT></B> EPS = 1e-12;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> PT { 
+  <FONT COLOR="#228B22"><B>double</FONT></B> x, y; 
+  PT() {}
+  PT(<FONT COLOR="#228B22"><B>double</FONT></B> x, <FONT COLOR="#228B22"><B>double</FONT></B> y) : x(x), y(y) {}
+  PT(<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;p) : x(p.x), y(p.y)    {}
+  PT <B><FONT COLOR="#A020F0">operator</FONT></B> + (<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;p)  <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> PT(x+p.x, y+p.y); }
+  PT <B><FONT COLOR="#A020F0">operator</FONT></B> - (<FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;p)  <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> PT(x-p.x, y-p.y); }
+  PT <B><FONT COLOR="#A020F0">operator</FONT></B> * (<FONT COLOR="#228B22"><B>double</FONT></B> c)     <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> PT(x*c,   y*c  ); }
+  PT <B><FONT COLOR="#A020F0">operator</FONT></B> / (<FONT COLOR="#228B22"><B>double</FONT></B> c)     <FONT COLOR="#228B22"><B>const</FONT></B> { <B><FONT COLOR="#A020F0">return</FONT></B> PT(x/c,   y/c  ); }
+};
+
+<FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">dot</FONT></B>(PT p, PT q)     { <B><FONT COLOR="#A020F0">return</FONT></B> p.x*q.x+p.y*q.y; }
+<FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">dist2</FONT></B>(PT p, PT q)   { <B><FONT COLOR="#A020F0">return</FONT></B> dot(p-q,p-q); }
+<FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">cross</FONT></B>(PT p, PT q)   { <B><FONT COLOR="#A020F0">return</FONT></B> p.x*q.y-p.y*q.x; }
+ostream &amp;<B><FONT COLOR="#A020F0">operator</FONT></B>&lt;&lt;(ostream &amp;os, <FONT COLOR="#228B22"><B>const</FONT></B> PT &amp;p) {
+  os &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> &lt;&lt; p.x &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;,&quot;</FONT></B> &lt;&lt; p.y &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>; 
+}
+
+<I><FONT COLOR="#B22222">// rotate a point CCW or CW around the origin
+</FONT></I>PT <B><FONT COLOR="#0000FF">RotateCCW90</FONT></B>(PT p)   { <B><FONT COLOR="#A020F0">return</FONT></B> PT(-p.y,p.x); }
+PT <B><FONT COLOR="#0000FF">RotateCW90</FONT></B>(PT p)    { <B><FONT COLOR="#A020F0">return</FONT></B> PT(p.y,-p.x); }
+PT <B><FONT COLOR="#0000FF">RotateCCW</FONT></B>(PT p, <FONT COLOR="#228B22"><B>double</FONT></B> t) { 
+  <B><FONT COLOR="#A020F0">return</FONT></B> PT(p.x*cos(t)-p.y*sin(t), p.x*sin(t)+p.y*cos(t)); 
+}
+
+<I><FONT COLOR="#B22222">// project point c onto line through a and b
+</FONT></I><I><FONT COLOR="#B22222">// assuming a != b
+</FONT></I>PT <B><FONT COLOR="#0000FF">ProjectPointLine</FONT></B>(PT a, PT b, PT c) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> a + (b-a)*dot(c-a, b-a)/dot(b-a, b-a);
+}
+
+<I><FONT COLOR="#B22222">// project point c onto line segment through a and b
+</FONT></I>PT <B><FONT COLOR="#0000FF">ProjectPointSegment</FONT></B>(PT a, PT b, PT c) {
+  <FONT COLOR="#228B22"><B>double</FONT></B> r = dot(b-a,b-a);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(r) &lt; EPS) <B><FONT COLOR="#A020F0">return</FONT></B> a;
+  r = dot(c-a, b-a)/r;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (r &lt; 0) <B><FONT COLOR="#A020F0">return</FONT></B> a;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (r &gt; 1) <B><FONT COLOR="#A020F0">return</FONT></B> b;
+  <B><FONT COLOR="#A020F0">return</FONT></B> a + (b-a)*r;
+}
+
+<I><FONT COLOR="#B22222">// compute distance from c to segment between a and b
+</FONT></I><FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">DistancePointSegment</FONT></B>(PT a, PT b, PT c) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> sqrt(dist2(c, ProjectPointSegment(a, b, c)));
+}
+
+<I><FONT COLOR="#B22222">// compute distance between point (x,y,z) and plane ax+by+cz=d
+</FONT></I><FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">DistancePointPlane</FONT></B>(<FONT COLOR="#228B22"><B>double</FONT></B> x, <FONT COLOR="#228B22"><B>double</FONT></B> y, <FONT COLOR="#228B22"><B>double</FONT></B> z,
+                          <FONT COLOR="#228B22"><B>double</FONT></B> a, <FONT COLOR="#228B22"><B>double</FONT></B> b, <FONT COLOR="#228B22"><B>double</FONT></B> c, <FONT COLOR="#228B22"><B>double</FONT></B> d)
+{
+  <B><FONT COLOR="#A020F0">return</FONT></B> fabs(a*x+b*y+c*z-d)/sqrt(a*a+b*b+c*c);
+}
+
+<I><FONT COLOR="#B22222">// determine if lines from a to b and c to d are parallel or collinear
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">LinesParallel</FONT></B>(PT a, PT b, PT c, PT d) { 
+  <B><FONT COLOR="#A020F0">return</FONT></B> fabs(cross(b-a, c-d)) &lt; EPS; 
+}
+
+<FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">LinesCollinear</FONT></B>(PT a, PT b, PT c, PT d) { 
+  <B><FONT COLOR="#A020F0">return</FONT></B> LinesParallel(a, b, c, d)
+      &amp;&amp; fabs(cross(a-b, a-c)) &lt; EPS
+      &amp;&amp; fabs(cross(c-d, c-a)) &lt; EPS; 
+}
+
+<I><FONT COLOR="#B22222">// determine if line segment from a to b intersects with 
+</FONT></I><I><FONT COLOR="#B22222">// line segment from c to d
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">SegmentsIntersect</FONT></B>(PT a, PT b, PT c, PT d) {
+  <B><FONT COLOR="#A020F0">if</FONT></B> (LinesCollinear(a, b, c, d)) {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dist2(a, c) &lt; EPS || dist2(a, d) &lt; EPS ||
+      dist2(b, c) &lt; EPS || dist2(b, d) &lt; EPS) <B><FONT COLOR="#A020F0">return</FONT></B> true;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dot(c-a, c-b) &gt; 0 &amp;&amp; dot(d-a, d-b) &gt; 0 &amp;&amp; dot(c-b, d-b) &gt; 0)
+      <B><FONT COLOR="#A020F0">return</FONT></B> false;
+    <B><FONT COLOR="#A020F0">return</FONT></B> true;
+  }
+  <B><FONT COLOR="#A020F0">if</FONT></B> (cross(d-a, b-a) * cross(c-a, b-a) &gt; 0) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (cross(a-c, d-c) * cross(b-c, d-c) &gt; 0) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  <B><FONT COLOR="#A020F0">return</FONT></B> true;
+}
+
+<I><FONT COLOR="#B22222">// compute intersection of line passing through a and b
+</FONT></I><I><FONT COLOR="#B22222">// with line passing through c and d, assuming that unique
+</FONT></I><I><FONT COLOR="#B22222">// intersection exists; for segment intersection, check if
+</FONT></I><I><FONT COLOR="#B22222">// segments intersect first
+</FONT></I>PT <B><FONT COLOR="#0000FF">ComputeLineIntersection</FONT></B>(PT a, PT b, PT c, PT d) {
+  b=b-a; d=c-d; c=c-a;
+  assert(dot(b, b) &gt; EPS &amp;&amp; dot(d, d) &gt; EPS);
+  <B><FONT COLOR="#A020F0">return</FONT></B> a + b*cross(c, d)/cross(b, d);
+}
+
+<I><FONT COLOR="#B22222">// compute center of circle given three points
+</FONT></I>PT <B><FONT COLOR="#0000FF">ComputeCircleCenter</FONT></B>(PT a, PT b, PT c) {
+  b=(a+b)/2;
+  c=(a+c)/2;
+  <B><FONT COLOR="#A020F0">return</FONT></B> ComputeLineIntersection(b, b+RotateCW90(a-b), c, c+RotateCW90(a-c));
+}
+
+<I><FONT COLOR="#B22222">// determine if point is in a possibly non-convex polygon (by William
+</FONT></I><I><FONT COLOR="#B22222">// Randolph Franklin); returns 1 for strictly interior points, 0 for
+</FONT></I><I><FONT COLOR="#B22222">// strictly exterior points, and 0 or 1 for the remaining points.
+</FONT></I><I><FONT COLOR="#B22222">// Note that it is possible to convert this into an *exact* test using
+</FONT></I><I><FONT COLOR="#B22222">// integer arithmetic by taking care of the division appropriately
+</FONT></I><I><FONT COLOR="#B22222">// (making sure to deal with signs properly) and then by writing exact
+</FONT></I><I><FONT COLOR="#B22222">// tests for checking point on polygon boundary
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">PointInPolygon</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p, PT q) {
+  <FONT COLOR="#228B22"><B>bool</FONT></B> c = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; p.size(); i++){
+    <FONT COLOR="#228B22"><B>int</FONT></B> j = (i+1)%p.size();
+    <B><FONT COLOR="#A020F0">if</FONT></B> ((p[i].y &lt;= q.y &amp;&amp; q.y &lt; p[j].y || 
+      p[j].y &lt;= q.y &amp;&amp; q.y &lt; p[i].y) &amp;&amp;
+      q.x &lt; p[i].x + (p[j].x - p[i].x) * (q.y - p[i].y) / (p[j].y - p[i].y))
+      c = !c;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> c;
+}
+
+<I><FONT COLOR="#B22222">// determine if point is on the boundary of a polygon
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">PointOnPolygon</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p, PT q) {
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; p.size(); i++)
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dist2(ProjectPointSegment(p[i], p[(i+1)%p.size()], q), q) &lt; EPS)
+      <B><FONT COLOR="#A020F0">return</FONT></B> true;
+    <B><FONT COLOR="#A020F0">return</FONT></B> false;
+}
+
+<I><FONT COLOR="#B22222">// compute intersection of line through points a and b with
+</FONT></I><I><FONT COLOR="#B22222">// circle centered at c with radius r &gt; 0
+</FONT></I>vector&lt;PT&gt; CircleLineIntersection(PT a, PT b, PT c, <FONT COLOR="#228B22"><B>double</FONT></B> r) {
+  vector&lt;PT&gt; ret;
+  b = b-a;
+  a = a-c;
+  <FONT COLOR="#228B22"><B>double</FONT></B> A = dot(b, b);
+  <FONT COLOR="#228B22"><B>double</FONT></B> B = dot(a, b);
+  <FONT COLOR="#228B22"><B>double</FONT></B> C = dot(a, a) - r*r;
+  <FONT COLOR="#228B22"><B>double</FONT></B> D = B*B - A*C;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (D &lt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+  ret.push_back(c+a+b*(-B+sqrt(D+EPS))/A);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (D &gt; EPS)
+    ret.push_back(c+a+b*(-B-sqrt(D))/A);
+  <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+
+<I><FONT COLOR="#B22222">// compute intersection of circle centered at a with radius r
+</FONT></I><I><FONT COLOR="#B22222">// with circle centered at b with radius R
+</FONT></I>vector&lt;PT&gt; CircleCircleIntersection(PT a, PT b, <FONT COLOR="#228B22"><B>double</FONT></B> r, <FONT COLOR="#228B22"><B>double</FONT></B> R) {
+  vector&lt;PT&gt; ret;
+  <FONT COLOR="#228B22"><B>double</FONT></B> d = sqrt(dist2(a, b));
+  <B><FONT COLOR="#A020F0">if</FONT></B> (d &gt; r+R || d+min(r, R) &lt; max(r, R)) <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+  <FONT COLOR="#228B22"><B>double</FONT></B> x = (d*d-R*R+r*r)/(2*d);
+  <FONT COLOR="#228B22"><B>double</FONT></B> y = sqrt(r*r-x*x);
+  PT v = (b-a)/d;
+  ret.push_back(a+v*x + RotateCCW90(v)*y);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (y &gt; 0)
+    ret.push_back(a+v*x - RotateCCW90(v)*y);
+  <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+
+<I><FONT COLOR="#B22222">// This code computes the area or centroid of a (possibly nonconvex)
+</FONT></I><I><FONT COLOR="#B22222">// polygon, assuming that the coordinates are listed in a clockwise or
+</FONT></I><I><FONT COLOR="#B22222">// counterclockwise fashion.  Note that the centroid is often known as
+</FONT></I><I><FONT COLOR="#B22222">// the &quot;center of gravity&quot; or &quot;center of mass&quot;.
+</FONT></I><FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">ComputeSignedArea</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p) {
+  <FONT COLOR="#228B22"><B>double</FONT></B> area = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; p.size(); i++) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> j = (i+1) % p.size();
+    area += p[i].x*p[j].y - p[j].x*p[i].y;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> area / 2.0;
+}
+
+<FONT COLOR="#228B22"><B>double</FONT></B> <B><FONT COLOR="#0000FF">ComputeArea</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> fabs(ComputeSignedArea(p));
+}
+
+PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p) {
+  PT c(0,0);
+  <FONT COLOR="#228B22"><B>double</FONT></B> scale = 6.0 * ComputeSignedArea(p);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; p.size(); i++){
+    <FONT COLOR="#228B22"><B>int</FONT></B> j = (i+1) % p.size();
+    c = c + (p[i]+p[j])*(p[i].x*p[j].y - p[j].x*p[i].y);
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> c / scale;
+}
+
+<I><FONT COLOR="#B22222">// tests whether or not a given polygon (in CW or CCW order) is simple
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">IsSimple</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;PT&gt; &amp;p) {
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; p.size(); i++) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = i+1; k &lt; p.size(); k++) {
+      <FONT COLOR="#228B22"><B>int</FONT></B> j = (i+1) % p.size();
+      <FONT COLOR="#228B22"><B>int</FONT></B> l = (k+1) % p.size();
+      <B><FONT COLOR="#A020F0">if</FONT></B> (i == l || j == k) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+      <B><FONT COLOR="#A020F0">if</FONT></B> (SegmentsIntersect(p[i], p[j], p[k], p[l])) 
+        <B><FONT COLOR="#A020F0">return</FONT></B> false;
+    }
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> true;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+  
+  <I><FONT COLOR="#B22222">// expected: (-5,2)
+</FONT></I>  cerr &lt;&lt; RotateCCW90(PT(2,5)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (5,-2)
+</FONT></I>  cerr &lt;&lt; RotateCW90(PT(2,5)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (-5,2)
+</FONT></I>  cerr &lt;&lt; RotateCCW(PT(2,5),M_PI/2) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (5,2)
+</FONT></I>  cerr &lt;&lt; ProjectPointLine(PT(-5,-2), PT(10,4), PT(3,7)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (5,2) (7.5,3) (2.5,1)
+</FONT></I>  cerr &lt;&lt; ProjectPointSegment(PT(-5,-2), PT(10,4), PT(3,7)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; ProjectPointSegment(PT(7.5,3), PT(10,4), PT(3,7)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; ProjectPointSegment(PT(-5,-2), PT(2.5,1), PT(3,7)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 6.78903
+</FONT></I>  cerr &lt;&lt; DistancePointPlane(4,-4,3,2,-2,5,-8) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 1 0 1
+</FONT></I>  cerr &lt;&lt; LinesParallel(PT(1,1), PT(3,5), PT(2,1), PT(4,5)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; LinesParallel(PT(1,1), PT(3,5), PT(2,0), PT(4,5)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; LinesParallel(PT(1,1), PT(3,5), PT(5,9), PT(7,13)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 0 0 1
+</FONT></I>  cerr &lt;&lt; LinesCollinear(PT(1,1), PT(3,5), PT(2,1), PT(4,5)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; LinesCollinear(PT(1,1), PT(3,5), PT(2,0), PT(4,5)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; LinesCollinear(PT(1,1), PT(3,5), PT(5,9), PT(7,13)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 1 1 1 0
+</FONT></I>  cerr &lt;&lt; SegmentsIntersect(PT(0,0), PT(2,4), PT(3,1), PT(-1,3)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; SegmentsIntersect(PT(0,0), PT(2,4), PT(4,3), PT(0,5)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; SegmentsIntersect(PT(0,0), PT(2,4), PT(2,-1), PT(-2,1)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; SegmentsIntersect(PT(0,0), PT(2,4), PT(5,5), PT(1,7)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (1,2)
+</FONT></I>  cerr &lt;&lt; ComputeLineIntersection(PT(0,0), PT(2,4), PT(3,1), PT(-1,3)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (1,1)
+</FONT></I>  cerr &lt;&lt; ComputeCircleCenter(PT(-3,4), PT(6,1), PT(4,5)) &lt;&lt; endl;
+  
+  vector&lt;PT&gt; v; 
+  v.push_back(PT(0,0));
+  v.push_back(PT(5,0));
+  v.push_back(PT(5,5));
+  v.push_back(PT(0,5));
+  
+  <I><FONT COLOR="#B22222">// expected: 1 1 1 0 0
+</FONT></I>  cerr &lt;&lt; PointInPolygon(v, PT(2,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointInPolygon(v, PT(2,0)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointInPolygon(v, PT(0,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointInPolygon(v, PT(5,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointInPolygon(v, PT(2,5)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 0 1 1 1 1
+</FONT></I>  cerr &lt;&lt; PointOnPolygon(v, PT(2,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointOnPolygon(v, PT(2,0)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointOnPolygon(v, PT(0,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointOnPolygon(v, PT(5,2)) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>
+       &lt;&lt; PointOnPolygon(v, PT(2,5)) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: (1,6)
+</FONT></I>  <I><FONT COLOR="#B22222">//           (5,4) (4,5)
+</FONT></I>  <I><FONT COLOR="#B22222">//           blank line
+</FONT></I>  <I><FONT COLOR="#B22222">//           (4,5) (5,4)
+</FONT></I>  <I><FONT COLOR="#B22222">//           blank line
+</FONT></I>  <I><FONT COLOR="#B22222">//           (4,5) (5,4)
+</FONT></I>  vector&lt;PT&gt; u = CircleLineIntersection(PT(0,6), PT(2,6), PT(1,1), 5);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  u = CircleLineIntersection(PT(0,9), PT(9,0), PT(1,1), 5);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  u = CircleCircleIntersection(PT(1,1), PT(10,10), 5, 5);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  u = CircleCircleIntersection(PT(1,1), PT(8,8), 5, 5);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  u = CircleCircleIntersection(PT(1,1), PT(4.5,4.5), 10, sqrt(2.0)/2.0);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  u = CircleCircleIntersection(PT(1,1), PT(4.5,4.5), 5, sqrt(2.0)/2.0);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; u.size(); i++) cerr &lt;&lt; u[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; cerr &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// area should be 5.0
+</FONT></I>  <I><FONT COLOR="#B22222">// centroid should be (1.1666666, 1.166666)
+</FONT></I>  PT pa[] = { PT(0,0), PT(5,0), PT(1,1), PT(0,5) };
+  vector&lt;PT&gt; p(pa, pa+4);
+  PT c = ComputeCentroid(p);
+  cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Area: &quot;</FONT></B> &lt;&lt; ComputeArea(p) &lt;&lt; endl;
+  cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Centroid: &quot;</FONT></B> &lt;&lt; c &lt;&lt; endl;
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file10">
+<H1>JavaGeometry.java 10/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// In this example, we read an input file containing three lines, each
+</FONT></I><I><FONT COLOR="#B22222">// containing an even number of doubles, separated by commas.  The first two
+</FONT></I><I><FONT COLOR="#B22222">// lines represent the coordinates of two polygons, given in counterclockwise 
+</FONT></I><I><FONT COLOR="#B22222">// (or clockwise) order, which we will call &quot;A&quot; and &quot;B&quot;.  The last line 
+</FONT></I><I><FONT COLOR="#B22222">// contains a list of points, p[1], p[2], ...
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Our goal is to determine:
+</FONT></I><I><FONT COLOR="#B22222">//   (1) whether B - A is a single closed shape (as opposed to multiple shapes)
+</FONT></I><I><FONT COLOR="#B22222">//   (2) the area of B - A
+</FONT></I><I><FONT COLOR="#B22222">//   (3) whether each p[i] is in the interior of B - A
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT:
+</FONT></I><I><FONT COLOR="#B22222">//   0 0 10 0 0 10
+</FONT></I><I><FONT COLOR="#B22222">//   0 0 10 10 10 0
+</FONT></I><I><FONT COLOR="#B22222">//   8 6
+</FONT></I><I><FONT COLOR="#B22222">//   5 1
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:
+</FONT></I><I><FONT COLOR="#B22222">//   The area is singular.
+</FONT></I><I><FONT COLOR="#B22222">//   The area is 25.0
+</FONT></I><I><FONT COLOR="#B22222">//   Point belongs to the area.
+</FONT></I><I><FONT COLOR="#B22222">//   Point does not belong to the area.
+</FONT></I>
+<B><FONT COLOR="#A020F0">import</FONT></B> java.util.*;
+<B><FONT COLOR="#A020F0">import</FONT></B> java.awt.geom.*;
+<B><FONT COLOR="#A020F0">import</FONT></B> java.io.*;
+
+<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> JavaGeometry {
+
+    <I><FONT COLOR="#B22222">// make an array of doubles from a string
+</FONT></I>    <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B>[] readPoints(String s) {
+        String[] arr = s.trim().split(<FONT COLOR="#BC8F8F"><B>&quot;\\s++&quot;</FONT></B>);
+        <B><FONT COLOR="#A020F0">double</FONT></B>[] ret = <B><FONT COLOR="#A020F0">new</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B>[arr.length];
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#A020F0">int</FONT></B> i = 0; i &lt; arr.length; i++) ret[i] = Double.parseDouble(arr[i]);
+        <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+    }
+
+    <I><FONT COLOR="#B22222">// make an Area object from the coordinates of a polygon
+</FONT></I>    <B><FONT COLOR="#A020F0">static</FONT></B> Area makeArea(<B><FONT COLOR="#A020F0">double</FONT></B>[] pts) {
+        Path2D.Double p = <B><FONT COLOR="#A020F0">new</FONT></B> Path2D.Double();
+        p.moveTo(pts[0], pts[1]);
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#A020F0">int</FONT></B> i = 2; i &lt; pts.length; i += 2) p.lineTo(pts[i], pts[i+1]);
+        p.closePath();
+        <B><FONT COLOR="#A020F0">return</FONT></B> <B><FONT COLOR="#A020F0">new</FONT></B> Area(p);        
+    }
+
+    <I><FONT COLOR="#B22222">// compute area of polygon
+</FONT></I>    <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> computePolygonArea(ArrayList&lt;Point2D.Double&gt; points) {
+        Point2D.Double[] pts = points.toArray(<B><FONT COLOR="#A020F0">new</FONT></B> Point2D.Double[points.size()]);  
+        <B><FONT COLOR="#A020F0">double</FONT></B> area = 0;
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#A020F0">int</FONT></B> i = 0; i &lt; pts.length; i++){
+            <B><FONT COLOR="#A020F0">int</FONT></B> j = (i+1) % pts.length;
+            area += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+        }        
+        <B><FONT COLOR="#A020F0">return</FONT></B> Math.abs(area)/2;
+    }
+
+    <I><FONT COLOR="#B22222">// compute the area of an Area object containing several disjoint polygons
+</FONT></I>    <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> computeArea(Area area) {
+        <B><FONT COLOR="#A020F0">double</FONT></B> totArea = 0;
+        PathIterator iter = area.getPathIterator(<B><FONT COLOR="#A020F0">null</FONT></B>);
+        ArrayList&lt;Point2D.Double&gt; points = <B><FONT COLOR="#A020F0">new</FONT></B> ArrayList&lt;Point2D.Double&gt;();
+
+        <B><FONT COLOR="#A020F0">while</FONT></B> (!iter.isDone()) {
+            <B><FONT COLOR="#A020F0">double</FONT></B>[] buffer = <B><FONT COLOR="#A020F0">new</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B>[6];
+            <B><FONT COLOR="#A020F0">switch</FONT></B> (iter.currentSegment(buffer)) {
+            <B><FONT COLOR="#A020F0">case</FONT></B> PathIterator.SEG_MOVETO:
+            <B><FONT COLOR="#A020F0">case</FONT></B> PathIterator.SEG_LINETO:
+                points.add(<B><FONT COLOR="#A020F0">new</FONT></B> Point2D.Double(buffer[0], buffer[1]));
+                <B><FONT COLOR="#A020F0">break</FONT></B>;
+            <B><FONT COLOR="#A020F0">case</FONT></B> PathIterator.SEG_CLOSE:
+                totArea += computePolygonArea(points);
+                points.clear();
+                <B><FONT COLOR="#A020F0">break</FONT></B>;
+            }
+            iter.next();
+        }
+        <B><FONT COLOR="#A020F0">return</FONT></B> totArea;
+    }
+
+    <I><FONT COLOR="#B22222">// notice that the main() throws an Exception -- necessary to
+</FONT></I>    <I><FONT COLOR="#B22222">// avoid wrapping the Scanner object for file reading in a 
+</FONT></I>    <I><FONT COLOR="#B22222">// try { ... } catch block.
+</FONT></I>    <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> main(String args[]) <B><FONT COLOR="#A020F0">throws</FONT></B> Exception {
+
+        Scanner scanner = <B><FONT COLOR="#A020F0">new</FONT></B> Scanner(<B><FONT COLOR="#A020F0">new</FONT></B> File(<FONT COLOR="#BC8F8F"><B>&quot;input.txt&quot;</FONT></B>));
+        <I><FONT COLOR="#B22222">// also,
+</FONT></I>        <I><FONT COLOR="#B22222">//   Scanner scanner = new Scanner (System.in);
+</FONT></I>
+        <B><FONT COLOR="#A020F0">double</FONT></B>[] pointsA = readPoints(scanner.nextLine());
+        <B><FONT COLOR="#A020F0">double</FONT></B>[] pointsB = readPoints(scanner.nextLine());
+        Area areaA = makeArea(pointsA);
+        Area areaB = makeArea(pointsB);
+        areaB.subtract(areaA);
+        <I><FONT COLOR="#B22222">// also,
+</FONT></I>        <I><FONT COLOR="#B22222">//   areaB.exclusiveOr (areaA);
+</FONT></I>        <I><FONT COLOR="#B22222">//   areaB.add (areaA);
+</FONT></I>        <I><FONT COLOR="#B22222">//   areaB.intersect (areaA);
+</FONT></I>        
+        <I><FONT COLOR="#B22222">// (1) determine whether B - A is a single closed shape (as 
+</FONT></I>        <I><FONT COLOR="#B22222">//     opposed to multiple shapes)
+</FONT></I>        <B><FONT COLOR="#A020F0">boolean</FONT></B> isSingle = areaB.isSingular();
+        <I><FONT COLOR="#B22222">// also,
+</FONT></I>        <I><FONT COLOR="#B22222">//   areaB.isEmpty();
+</FONT></I>
+        <B><FONT COLOR="#A020F0">if</FONT></B> (isSingle)
+            System.out.println(<FONT COLOR="#BC8F8F"><B>&quot;The area is singular.&quot;</FONT></B>);
+        <B><FONT COLOR="#A020F0">else</FONT></B>
+            System.out.println(<FONT COLOR="#BC8F8F"><B>&quot;The area is not singular.&quot;</FONT></B>);
+        
+        <I><FONT COLOR="#B22222">// (2) compute the area of B - A
+</FONT></I>        System.out.println(<FONT COLOR="#BC8F8F"><B>&quot;The area is &quot;</FONT></B> + computeArea(areaB) + <FONT COLOR="#BC8F8F"><B>&quot;.&quot;</FONT></B>);
+        
+        <I><FONT COLOR="#B22222">// (3) determine whether each p[i] is in the interior of B - A
+</FONT></I>        <B><FONT COLOR="#A020F0">while</FONT></B> (scanner.hasNextDouble()) {
+            <B><FONT COLOR="#A020F0">double</FONT></B> x = scanner.nextDouble();
+            assert(scanner.hasNextDouble());
+            <B><FONT COLOR="#A020F0">double</FONT></B> y = scanner.nextDouble();
+
+            <B><FONT COLOR="#A020F0">if</FONT></B> (areaB.contains(x,y)) {
+                System.out.println (<FONT COLOR="#BC8F8F"><B>&quot;Point belongs to the area.&quot;</FONT></B>);
+            } <B><FONT COLOR="#A020F0">else</FONT></B> {
+                System.out.println (<FONT COLOR="#BC8F8F"><B>&quot;Point does not belong to the area.&quot;</FONT></B>);
+            }
+        }
+
+        <I><FONT COLOR="#B22222">// Finally, some useful things we didn't use in this example:
+</FONT></I>        <I><FONT COLOR="#B22222">//
+</FONT></I>        <I><FONT COLOR="#B22222">//   Ellipse2D.Double ellipse = new Ellipse2D.Double (double x, double y, 
+</FONT></I>        <I><FONT COLOR="#B22222">//                                                    double w, double h);
+</FONT></I>        <I><FONT COLOR="#B22222">//
+</FONT></I>        <I><FONT COLOR="#B22222">//     creates an ellipse inscribed in box with bottom-left corner (x,y)
+</FONT></I>        <I><FONT COLOR="#B22222">//     and upper-right corner (x+y,w+h)
+</FONT></I>        <I><FONT COLOR="#B22222">// 
+</FONT></I>        <I><FONT COLOR="#B22222">//   Rectangle2D.Double rect = new Rectangle2D.Double (double x, double y, 
+</FONT></I>        <I><FONT COLOR="#B22222">//                                                     double w, double h);
+</FONT></I>        <I><FONT COLOR="#B22222">//
+</FONT></I>        <I><FONT COLOR="#B22222">//     creates a box with bottom-left corner (x,y) and upper-right 
+</FONT></I>        <I><FONT COLOR="#B22222">//     corner (x+y,w+h)
+</FONT></I>        <I><FONT COLOR="#B22222">//
+</FONT></I>        <I><FONT COLOR="#B22222">// Each of these can be embedded in an Area object (e.g., new Area (rect)).
+</FONT></I>
+    }
+}
+</PRE>
+<HR>
+<A NAME="file11">
+<H1>Geom3D.java 11/34</H1>
+<PRE>
+<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> Geom3D {
+  <I><FONT COLOR="#B22222">// distance from point (x, y, z) to plane aX + bY + cZ + d = 0
+</FONT></I>  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> ptPlaneDist(<B><FONT COLOR="#A020F0">double</FONT></B> x, <B><FONT COLOR="#A020F0">double</FONT></B> y, <B><FONT COLOR="#A020F0">double</FONT></B> z,
+      <B><FONT COLOR="#A020F0">double</FONT></B> a, <B><FONT COLOR="#A020F0">double</FONT></B> b, <B><FONT COLOR="#A020F0">double</FONT></B> c, <B><FONT COLOR="#A020F0">double</FONT></B> d) {
+    <B><FONT COLOR="#A020F0">return</FONT></B> Math.abs(a*x + b*y + c*z + d) / Math.sqrt(a*a + b*b + c*c);
+  }
+  
+  <I><FONT COLOR="#B22222">// distance between parallel planes aX + bY + cZ + d1 = 0 and
+</FONT></I>  <I><FONT COLOR="#B22222">// aX + bY + cZ + d2 = 0
+</FONT></I>  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> planePlaneDist(<B><FONT COLOR="#A020F0">double</FONT></B> a, <B><FONT COLOR="#A020F0">double</FONT></B> b, <B><FONT COLOR="#A020F0">double</FONT></B> c,
+      <B><FONT COLOR="#A020F0">double</FONT></B> d1, <B><FONT COLOR="#A020F0">double</FONT></B> d2) {
+    <B><FONT COLOR="#A020F0">return</FONT></B> Math.abs(d1 - d2) / Math.sqrt(a*a + b*b + c*c);
+  }
+  
+  <I><FONT COLOR="#B22222">// distance from point (px, py, pz) to line (x1, y1, z1)-(x2, y2, z2)
+</FONT></I>  <I><FONT COLOR="#B22222">// (or ray, or segment; in the case of the ray, the endpoint is the
+</FONT></I>  <I><FONT COLOR="#B22222">// first point)
+</FONT></I>  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">final</FONT></B> <B><FONT COLOR="#A020F0">int</FONT></B> LINE = 0;
+  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">final</FONT></B> <B><FONT COLOR="#A020F0">int</FONT></B> SEGMENT = 1;
+  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">final</FONT></B> <B><FONT COLOR="#A020F0">int</FONT></B> RAY = 2;
+  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> ptLineDistSq(<B><FONT COLOR="#A020F0">double</FONT></B> x1, <B><FONT COLOR="#A020F0">double</FONT></B> y1, <B><FONT COLOR="#A020F0">double</FONT></B> z1,
+      <B><FONT COLOR="#A020F0">double</FONT></B> x2, <B><FONT COLOR="#A020F0">double</FONT></B> y2, <B><FONT COLOR="#A020F0">double</FONT></B> z2, <B><FONT COLOR="#A020F0">double</FONT></B> px, <B><FONT COLOR="#A020F0">double</FONT></B> py, <B><FONT COLOR="#A020F0">double</FONT></B> pz,
+      <B><FONT COLOR="#A020F0">int</FONT></B> type) {
+    <B><FONT COLOR="#A020F0">double</FONT></B> pd2 = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2);
+    
+    <B><FONT COLOR="#A020F0">double</FONT></B> x, y, z;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (pd2 == 0) {
+      x = x1;
+      y = y1;
+      z = z1;
+    } <B><FONT COLOR="#A020F0">else</FONT></B> {
+      <B><FONT COLOR="#A020F0">double</FONT></B> u = ((px-x1)*(x2-x1) + (py-y1)*(y2-y1) + (pz-z1)*(z2-z1)) / pd2;
+      x = x1 + u * (x2 - x1);
+      y = y1 + u * (y2 - y1);
+      z = z1 + u * (z2 - z1);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (type != LINE &amp;&amp; u &lt; 0) {
+        x = x1;
+        y = y1;
+        z = z1;
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (type == SEGMENT &amp;&amp; u &gt; 1.0) {
+        x = x2;
+        y = y2;
+        z = z2;
+      }
+    }
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> (x-px)*(x-px) + (y-py)*(y-py) + (z-pz)*(z-pz);
+  }
+  
+  <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">double</FONT></B> ptLineDist(<B><FONT COLOR="#A020F0">double</FONT></B> x1, <B><FONT COLOR="#A020F0">double</FONT></B> y1, <B><FONT COLOR="#A020F0">double</FONT></B> z1,
+      <B><FONT COLOR="#A020F0">double</FONT></B> x2, <B><FONT COLOR="#A020F0">double</FONT></B> y2, <B><FONT COLOR="#A020F0">double</FONT></B> z2, <B><FONT COLOR="#A020F0">double</FONT></B> px, <B><FONT COLOR="#A020F0">double</FONT></B> py, <B><FONT COLOR="#A020F0">double</FONT></B> pz,
+      <B><FONT COLOR="#A020F0">int</FONT></B> type) {
+    <B><FONT COLOR="#A020F0">return</FONT></B> Math.sqrt(ptLineDistSq(x1, y1, z1, x2, y2, z2, px, py, pz, type));
+  }
+}
+</PRE>
+<HR>
+<A NAME="file12">
+<H1>Delaunay.cc 12/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Slow but simple Delaunay triangulation. Does not handle
+</FONT></I><I><FONT COLOR="#B22222">// degenerate cases (from O'Rourke, Computational Geometry in C)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n^4)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT:    x[] = x-coordinates
+</FONT></I><I><FONT COLOR="#B22222">//           y[] = y-coordinates
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:   triples = a vector containing m triples of indices
+</FONT></I><I><FONT COLOR="#B22222">//                     corresponding to triangle vertices
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;</FONT></B>
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> T;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> triple {
+    <FONT COLOR="#228B22"><B>int</FONT></B> i, j, k;
+    triple() {}
+    triple(<FONT COLOR="#228B22"><B>int</FONT></B> i, <FONT COLOR="#228B22"><B>int</FONT></B> j, <FONT COLOR="#228B22"><B>int</FONT></B> k) : i(i), j(j), k(k) {}
+};
+
+vector&lt;triple&gt; delaunayTriangulation(vector&lt;T&gt;&amp; x, vector&lt;T&gt;&amp; y) {
+	<FONT COLOR="#228B22"><B>int</FONT></B> n = x.size();
+	vector&lt;T&gt; z(n);
+	vector&lt;triple&gt; ret;
+
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++)
+	    z[i] = x[i] * x[i] + y[i] * y[i];
+
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n-2; i++) {
+	    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = i+1; j &lt; n; j++) {
+		<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = i+1; k &lt; n; k++) {
+		    <B><FONT COLOR="#A020F0">if</FONT></B> (j == k) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+		    <FONT COLOR="#228B22"><B>double</FONT></B> xn = (y[j]-y[i])*(z[k]-z[i]) - (y[k]-y[i])*(z[j]-z[i]);
+		    <FONT COLOR="#228B22"><B>double</FONT></B> yn = (x[k]-x[i])*(z[j]-z[i]) - (x[j]-x[i])*(z[k]-z[i]);
+		    <FONT COLOR="#228B22"><B>double</FONT></B> zn = (x[j]-x[i])*(y[k]-y[i]) - (x[k]-x[i])*(y[j]-y[i]);
+		    <FONT COLOR="#228B22"><B>bool</FONT></B> flag = zn &lt; 0;
+		    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> m = 0; flag &amp;&amp; m &lt; n; m++)
+			flag = flag &amp;&amp; ((x[m]-x[i])*xn + 
+					(y[m]-y[i])*yn + 
+					(z[m]-z[i])*zn &lt;= 0);
+		    <B><FONT COLOR="#A020F0">if</FONT></B> (flag) ret.push_back(triple(i, j, k));
+		}
+	    }
+	}
+	<B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+    T xs[]={0, 0, 1, 0.9};
+    T ys[]={0, 1, 0, 0.9};
+    vector&lt;T&gt; x(&amp;xs[0], &amp;xs[4]), y(&amp;ys[0], &amp;ys[4]);
+    vector&lt;triple&gt; tri = delaunayTriangulation(x, y);
+    
+    <I><FONT COLOR="#B22222">//expected: 0 1 3
+</FONT></I>    <I><FONT COLOR="#B22222">//          0 3 2
+</FONT></I>    
+    <FONT COLOR="#228B22"><B>int</FONT></B> i;
+    <B><FONT COLOR="#A020F0">for</FONT></B>(i = 0; i &lt; tri.size(); i++)
+        printf(<FONT COLOR="#BC8F8F"><B>&quot;%d %d %d\n&quot;</FONT></B>, tri[i].i, tri[i].j, tri[i].k);
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file13">
+<H1>Euclid.cc 13/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// This is a collection of useful code for solving problems that
+</FONT></I><I><FONT COLOR="#B22222">// involve modular linear equations.  Note that all of the
+</FONT></I><I><FONT COLOR="#B22222">// algorithms described here work on nonnegative integers.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;algorithm&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>,<FONT COLOR="#228B22"><B>int</FONT></B>&gt; PII;
+
+<I><FONT COLOR="#B22222">// return a % b (positive value)
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">mod</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> ((a%b)+b)%b;
+}
+
+<I><FONT COLOR="#B22222">// computes gcd(a,b)
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">gcd</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> tmp;
+  <B><FONT COLOR="#A020F0">while</FONT></B>(b){a%=b; tmp=a; a=b; b=tmp;}
+  <B><FONT COLOR="#A020F0">return</FONT></B> a;
+}
+
+<I><FONT COLOR="#B22222">// computes lcm(a,b)
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">lcm</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b) {
+  <B><FONT COLOR="#A020F0">return</FONT></B> a/gcd(a,b)*b;
+}
+
+<I><FONT COLOR="#B22222">// returns d = gcd(a,b); finds x,y such that d = ax + by
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">extended_euclid</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;x, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;y) {  
+  <FONT COLOR="#228B22"><B>int</FONT></B> xx = y = 0;
+  <FONT COLOR="#228B22"><B>int</FONT></B> yy = x = 1;
+  <B><FONT COLOR="#A020F0">while</FONT></B> (b) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> q = a/b;
+    <FONT COLOR="#228B22"><B>int</FONT></B> t = b; b = a%b; a = t;
+    t = xx; xx = x-q*xx; x = t;
+    t = yy; yy = y-q*yy; y = t;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> a;
+}
+
+<I><FONT COLOR="#B22222">// finds all solutions to ax = b (mod n)
+</FONT></I>VI <B><FONT COLOR="#0000FF">modular_linear_equation_solver</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b, <FONT COLOR="#228B22"><B>int</FONT></B> n) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> x, y;
+  VI solutions;
+  <FONT COLOR="#228B22"><B>int</FONT></B> d = extended_euclid(a, n, x, y);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (!(b%d)) {
+    x = mod (x*(b/d), n);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; d; i++)
+      solutions.push_back(mod(x + i*(n/d), n));
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> solutions;
+}
+
+<I><FONT COLOR="#B22222">// computes b such that ab = 1 (mod n), returns -1 on failure
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">mod_inverse</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> n) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> x, y;
+  <FONT COLOR="#228B22"><B>int</FONT></B> d = extended_euclid(a, n, x, y);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (d &gt; 1) <B><FONT COLOR="#A020F0">return</FONT></B> -1;
+  <B><FONT COLOR="#A020F0">return</FONT></B> mod(x,n);
+}
+
+<I><FONT COLOR="#B22222">// Chinese remainder theorem (special case): find z such that
+</FONT></I><I><FONT COLOR="#B22222">// z % x = a, z % y = b.  Here, z is unique modulo M = lcm(x,y).
+</FONT></I><I><FONT COLOR="#B22222">// Return (z,M).  On failure, M = -1.
+</FONT></I>PII <B><FONT COLOR="#0000FF">chinese_remainder_theorem</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x, <FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> y, <FONT COLOR="#228B22"><B>int</FONT></B> b) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> s, t;
+  <FONT COLOR="#228B22"><B>int</FONT></B> d = extended_euclid(x, y, s, t);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (a%d != b%d) <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(0, -1);
+  <B><FONT COLOR="#A020F0">return</FONT></B> make_pair(mod(s*b*x+t*a*y,x*y)/d, x*y/d);
+}
+
+<I><FONT COLOR="#B22222">// Chinese remainder theorem: find z such that
+</FONT></I><I><FONT COLOR="#B22222">// z % x[i] = a[i] for all i.  Note that the solution is
+</FONT></I><I><FONT COLOR="#B22222">// unique modulo M = lcm_i (x[i]).  Return (z,M).  On 
+</FONT></I><I><FONT COLOR="#B22222">// failure, M = -1.  Note that we do not require the a[i]'s
+</FONT></I><I><FONT COLOR="#B22222">// to be relatively prime.
+</FONT></I>PII <B><FONT COLOR="#0000FF">chinese_remainder_theorem</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> VI &amp;x, <FONT COLOR="#228B22"><B>const</FONT></B> VI &amp;a) {
+  PII ret = make_pair(a[0], x[0]);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 1; i &lt; x.size(); i++) {
+    ret = chinese_remainder_theorem(ret.second, ret.first, x[i], a[i]);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (ret.second == -1) <B><FONT COLOR="#A020F0">break</FONT></B>;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+
+<I><FONT COLOR="#B22222">// computes x and y such that ax + by = c; on failure, x = y =-1
+</FONT></I><FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">linear_diophantine</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b, <FONT COLOR="#228B22"><B>int</FONT></B> c, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;x, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;y) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> d = gcd(a,b);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (c%d) {
+    x = y = -1;
+  } <B><FONT COLOR="#A020F0">else</FONT></B> {
+    x = c/d * mod_inverse(a/d, b/d);
+    y = (c-a*x)/b;
+  }
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+  
+  <I><FONT COLOR="#B22222">// expected: 2
+</FONT></I>  cout &lt;&lt; gcd(14, 30) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 2 -2 1
+</FONT></I>  <FONT COLOR="#228B22"><B>int</FONT></B> x, y;
+  <FONT COLOR="#228B22"><B>int</FONT></B> d = extended_euclid(14, 30, x, y);
+  cout &lt;&lt; d &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; x &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; y &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 95 45
+</FONT></I>  VI sols = modular_linear_equation_solver(14, 30, 100);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; (<FONT COLOR="#228B22"><B>int</FONT></B>) sols.size(); i++) cout &lt;&lt; sols[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>; 
+  cout &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 8
+</FONT></I>  cout &lt;&lt; mod_inverse(8, 9) &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 23 56
+</FONT></I>  <I><FONT COLOR="#B22222">//           11 12
+</FONT></I>  <FONT COLOR="#228B22"><B>int</FONT></B> xs[] = {3, 5, 7, 4, 6};
+  <FONT COLOR="#228B22"><B>int</FONT></B> as[] = {2, 3, 2, 3, 5};
+  PII ret = chinese_remainder_theorem(VI (xs, xs+3), VI(as, as+3));
+  cout &lt;&lt; ret.first &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; ret.second &lt;&lt; endl;
+  ret = chinese_remainder_theorem (VI(xs+3, xs+5), VI(as+3, as+5));
+  cout &lt;&lt; ret.first &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; ret.second &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 5 -15
+</FONT></I>  linear_diophantine(7, 2, 5, x, y);
+  cout &lt;&lt; x &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; y &lt;&lt; endl;
+
+}
+</PRE>
+<HR>
+<A NAME="file14">
+<H1>GaussJordan.cc 14/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Gauss-Jordan elimination with full pivoting.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Uses:
+</FONT></I><I><FONT COLOR="#B22222">//   (1) solving systems of linear equations (AX=B)
+</FONT></I><I><FONT COLOR="#B22222">//   (2) inverting matrices (AX=I)
+</FONT></I><I><FONT COLOR="#B22222">//   (3) computing determinants of square matrices
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n^3)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT:    a[][] = an nxn matrix
+</FONT></I><I><FONT COLOR="#B22222">//           b[][] = an nxm matrix
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:   X      = an nxm matrix (stored in b[][])
+</FONT></I><I><FONT COLOR="#B22222">//           A^{-1} = an nxn matrix (stored in a[][])
+</FONT></I><I><FONT COLOR="#B22222">//           returns determinant of a[][]
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> EPS = 1e-10;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> T;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;T&gt; VT;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VT&gt; VVT;
+
+T GaussJordan(VVT &amp;a, VVT &amp;b) {
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n = a.size();
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> m = b[0].size();
+  VI irow(n), icol(n), ipiv(n);
+  T det = 1;
+
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> pj = -1, pk = -1;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (!ipiv[j])
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) <B><FONT COLOR="#A020F0">if</FONT></B> (!ipiv[k])
+	<B><FONT COLOR="#A020F0">if</FONT></B> (pj == -1 || fabs(a[j][k]) &gt; fabs(a[pj][pk])) { pj = j; pk = k; }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[pj][pk]) &lt; EPS) { cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Matrix is singular.&quot;</FONT></B> &lt;&lt; endl; exit(0); }
+    ipiv[pk]++;
+    swap(a[pj], a[pk]);
+    swap(b[pj], b[pk]);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (pj != pk) det *= -1;
+    irow[i] = pj;
+    icol[i] = pk;
+
+    T c = 1.0 / a[pk][pk];
+    det *= a[pk][pk];
+    a[pk][pk] = 1.0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> p = 0; p &lt; n; p++) a[pk][p] *= c;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> p = 0; p &lt; m; p++) b[pk][p] *= c;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> p = 0; p &lt; n; p++) <B><FONT COLOR="#A020F0">if</FONT></B> (p != pk) {
+      c = a[p][pk];
+      a[p][pk] = 0;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> q = 0; q &lt; n; q++) a[p][q] -= a[pk][q] * c;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> q = 0; q &lt; m; q++) b[p][q] -= b[pk][q] * c;      
+    }
+  }
+
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> p = n-1; p &gt;= 0; p--) <B><FONT COLOR="#A020F0">if</FONT></B> (irow[p] != icol[p]) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = 0; k &lt; n; k++) swap(a[k][irow[p]], a[k][icol[p]]);
+  }
+
+  <B><FONT COLOR="#A020F0">return</FONT></B> det;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n = 4;
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> m = 2;
+  <FONT COLOR="#228B22"><B>double</FONT></B> A[n][n] = { {1,2,3,4},{1,0,1,0},{5,3,2,4},{6,1,4,6} };
+  <FONT COLOR="#228B22"><B>double</FONT></B> B[n][m] = { {1,2},{4,3},{5,6},{8,7} };
+  VVT a(n), b(n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    a[i] = VT(A[i], A[i] + n);
+    b[i] = VT(B[i], B[i] + m);
+  }
+  
+  <FONT COLOR="#228B22"><B>double</FONT></B> det = GaussJordan(a, b);
+  
+  <I><FONT COLOR="#B22222">// expected: 60  
+</FONT></I>  cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Determinant: &quot;</FONT></B> &lt;&lt; det &lt;&lt; endl;
+
+  <I><FONT COLOR="#B22222">// expected: -0.233333 0.166667 0.133333 0.0666667
+</FONT></I>  <I><FONT COLOR="#B22222">//           0.166667 0.166667 0.333333 -0.333333
+</FONT></I>  <I><FONT COLOR="#B22222">//           0.233333 0.833333 -0.133333 -0.0666667
+</FONT></I>  <I><FONT COLOR="#B22222">//           0.05 -0.75 -0.1 0.2
+</FONT></I>  cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Inverse: &quot;</FONT></B> &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++)
+      cout &lt;&lt; a[i][j] &lt;&lt; <FONT COLOR="#BC8F8F"><B>' '</FONT></B>;
+    cout &lt;&lt; endl;
+  }
+  
+  <I><FONT COLOR="#B22222">// expected: 1.63333 1.3
+</FONT></I>  <I><FONT COLOR="#B22222">//           -0.166667 0.5
+</FONT></I>  <I><FONT COLOR="#B22222">//           2.36667 1.7
+</FONT></I>  <I><FONT COLOR="#B22222">//           -1.85 -1.35
+</FONT></I>  cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Solution: &quot;</FONT></B> &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; m; j++)
+      cout &lt;&lt; b[i][j] &lt;&lt; <FONT COLOR="#BC8F8F"><B>' '</FONT></B>;
+    cout &lt;&lt; endl;
+  }
+}
+</PRE>
+<HR>
+<A NAME="file15">
+<H1>ReducedRowEchelonForm.cc 15/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Reduced row echelon form via Gauss-Jordan elimination 
+</FONT></I><I><FONT COLOR="#B22222">// with partial pivoting.  This can be used for computing
+</FONT></I><I><FONT COLOR="#B22222">// the rank of a matrix.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n^3)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT:    a[][] = an nxm matrix
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:   rref[][] = an nxm matrix (stored in a[][])
+</FONT></I><I><FONT COLOR="#B22222">//           returns rank of a[][]
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> EPSILON = 1e-10;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> T;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;T&gt; VT;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VT&gt; VVT;
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">rref</FONT></B>(VVT &amp;a) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> n = a.size();
+  <FONT COLOR="#228B22"><B>int</FONT></B> m = a[0].size();
+  <FONT COLOR="#228B22"><B>int</FONT></B> r = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> c = 0; c &lt; m &amp;&amp; r &lt; n; c++) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> j = r;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = r+1; i &lt; n; i++) 
+      <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[i][c]) &gt; fabs(a[j][c])) j = i;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[j][c]) &lt; EPSILON) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+    swap(a[j], a[r]);
+   
+    T s = 1.0 / a[r][c];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; m; j++) a[r][j] *= s;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) {
+      T t = a[i][c];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; m; j++) a[i][j] -= t * a[r][j];
+    }
+    r++;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> r;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>(){
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n = 5;
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> m = 4;
+  <FONT COLOR="#228B22"><B>double</FONT></B> A[n][m] = { {16,2,3,13},{5,11,10,8},{9,7,6,12},{4,14,15,1},{13,21,21,13} };
+  VVT a(n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; n; i++)
+    a[i] = VT(A[i], A[i] + n);
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> rank = rref (a);
+  
+  <I><FONT COLOR="#B22222">// expected: 4
+</FONT></I>  cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Rank: &quot;</FONT></B> &lt;&lt; rank &lt;&lt; endl;
+  
+  <I><FONT COLOR="#B22222">// expected: 1 0 0 1 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 1 0 3 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 1 -3 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 0 2.78206e-15 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 0 3.22398e-15
+</FONT></I>  cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;rref: &quot;</FONT></B> &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; 5; i++){
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; 4; j++)
+      cout &lt;&lt; a[i][j] &lt;&lt; <FONT COLOR="#BC8F8F"><B>' '</FONT></B>;
+    cout &lt;&lt; endl;
+  }
+  
+}
+</PRE>
+<HR>
+<A NAME="file16">
+<H1>FFT_new.cpp 16/34</H1>
+<PRE>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cassert&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cstdio&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> cpx
+{
+  cpx(){}
+  cpx(<FONT COLOR="#228B22"><B>double</FONT></B> aa):a(aa){}
+  cpx(<FONT COLOR="#228B22"><B>double</FONT></B> aa, <FONT COLOR="#228B22"><B>double</FONT></B> bb):a(aa),b(bb){}
+  <FONT COLOR="#228B22"><B>double</FONT></B> a;
+  <FONT COLOR="#228B22"><B>double</FONT></B> b;
+  <FONT COLOR="#228B22"><B>double</FONT></B> modsq(<FONT COLOR="#228B22"><B>void</FONT></B>) <FONT COLOR="#228B22"><B>const</FONT></B>
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> a * a + b * b;
+  }
+  cpx bar(<FONT COLOR="#228B22"><B>void</FONT></B>) <FONT COLOR="#228B22"><B>const</FONT></B>
+  {
+    <B><FONT COLOR="#A020F0">return</FONT></B> cpx(a, -b);
+  }
+};
+
+cpx <B><FONT COLOR="#A020F0">operator</FONT></B> +(cpx a, cpx b)
+{
+  <B><FONT COLOR="#A020F0">return</FONT></B> cpx(a.a + b.a, a.b + b.b);
+}
+
+cpx <B><FONT COLOR="#A020F0">operator</FONT></B> *(cpx a, cpx b)
+{
+  <B><FONT COLOR="#A020F0">return</FONT></B> cpx(a.a * b.a - a.b * b.b, a.a * b.b + a.b * b.a);
+}
+
+cpx <B><FONT COLOR="#A020F0">operator</FONT></B> /(cpx a, cpx b)
+{
+  cpx r = a * b.bar();
+  <B><FONT COLOR="#A020F0">return</FONT></B> cpx(r.a / b.modsq(), r.b / b.modsq());
+}
+
+cpx <B><FONT COLOR="#0000FF">EXP</FONT></B>(<FONT COLOR="#228B22"><B>double</FONT></B> theta)
+{
+  <B><FONT COLOR="#A020F0">return</FONT></B> cpx(cos(theta),sin(theta));
+}
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> two_pi = 4 * acos(0);
+
+<I><FONT COLOR="#B22222">// in:     input array
+</FONT></I><I><FONT COLOR="#B22222">// out:    output array
+</FONT></I><I><FONT COLOR="#B22222">// step:   {SET TO 1} (used internally)
+</FONT></I><I><FONT COLOR="#B22222">// size:   length of the input/output {MUST BE A POWER OF 2}
+</FONT></I><I><FONT COLOR="#B22222">// dir:    either plus or minus one (direction of the FFT)
+</FONT></I><I><FONT COLOR="#B22222">// RESULT: out[k] = \sum_{j=0}^{size - 1} in[j] * exp(dir * 2pi * i * j * k / size)
+</FONT></I><FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">FFT</FONT></B>(cpx *in, cpx *out, <FONT COLOR="#228B22"><B>int</FONT></B> step, <FONT COLOR="#228B22"><B>int</FONT></B> size, <FONT COLOR="#228B22"><B>int</FONT></B> dir)
+{
+  <B><FONT COLOR="#A020F0">if</FONT></B>(size &lt; 1) <B><FONT COLOR="#A020F0">return</FONT></B>;
+  <B><FONT COLOR="#A020F0">if</FONT></B>(size == 1)
+  {
+    out[0] = in[0];
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  FFT(in, out, step * 2, size / 2, dir);
+  FFT(in + step, out + size / 2, step * 2, size / 2, dir);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; size / 2 ; i++)
+  {
+    cpx even = out[i];
+    cpx odd = out[i + size / 2];
+    out[i] = even + EXP(dir * two_pi * i / size) * odd;
+    out[i + size / 2] = even + EXP(dir * two_pi * (i + size / 2) / size) * odd;
+  }
+}
+
+<I><FONT COLOR="#B22222">// Usage:
+</FONT></I><I><FONT COLOR="#B22222">// f[0...N-1] and g[0..N-1] are numbers
+</FONT></I><I><FONT COLOR="#B22222">// Want to compute the convolution h, defined by
+</FONT></I><I><FONT COLOR="#B22222">// h[n] = sum of f[k]g[n-k] (k = 0, ..., N-1).
+</FONT></I><I><FONT COLOR="#B22222">// Here, the index is cyclic; f[-1] = f[N-1], f[-2] = f[N-2], etc.
+</FONT></I><I><FONT COLOR="#B22222">// Let F[0...N-1] be FFT(f), and similarly, define G and H.
+</FONT></I><I><FONT COLOR="#B22222">// The convolution theorem says H[n] = F[n]G[n] (element-wise product).
+</FONT></I><I><FONT COLOR="#B22222">// To compute h[] in O(N log N) time, do the following:
+</FONT></I><I><FONT COLOR="#B22222">//   1. Compute F and G (pass dir = 1 as the argument).
+</FONT></I><I><FONT COLOR="#B22222">//   2. Get H by element-wise multiplying F and G.
+</FONT></I><I><FONT COLOR="#B22222">//   3. Get h by taking the inverse FFT (use dir = -1 as the argument)
+</FONT></I><I><FONT COLOR="#B22222">//      and *dividing by N*. DO NOT FORGET THIS SCALING FACTOR.
+</FONT></I>
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>(<FONT COLOR="#228B22"><B>void</FONT></B>)
+{
+  printf(<FONT COLOR="#BC8F8F"><B>&quot;If rows come in identical pairs, then everything works.\n&quot;</FONT></B>);
+  
+  cpx a[8] = {0, 1, cpx(1,3), cpx(0,5), 1, 0, 2, 0};
+  cpx b[8] = {1, cpx(0,-2), cpx(0,1), 3, -1, -3, 1, -2};
+  cpx A[8];
+  cpx B[8];
+  FFT(a, A, 1, 8, 1);
+  FFT(b, B, 1, 8, 1);
+  
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+  {
+    printf(<FONT COLOR="#BC8F8F"><B>&quot;%7.2lf%7.2lf&quot;</FONT></B>, A[i].a, A[i].b);
+  }
+  printf(<FONT COLOR="#BC8F8F"><B>&quot;\n&quot;</FONT></B>);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+  {
+    cpx Ai(0,0);
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> j = 0 ; j &lt; 8 ; j++)
+    {
+      Ai = Ai + a[j] * EXP(j * i * two_pi / 8);
+    }
+    printf(<FONT COLOR="#BC8F8F"><B>&quot;%7.2lf%7.2lf&quot;</FONT></B>, Ai.a, Ai.b);
+  }
+  printf(<FONT COLOR="#BC8F8F"><B>&quot;\n&quot;</FONT></B>);
+  
+  cpx AB[8];
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+    AB[i] = A[i] * B[i];
+  cpx aconvb[8];
+  FFT(AB, aconvb, 1, 8, -1);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+    aconvb[i] = aconvb[i] / 8;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+  {
+    printf(<FONT COLOR="#BC8F8F"><B>&quot;%7.2lf%7.2lf&quot;</FONT></B>, aconvb[i].a, aconvb[i].b);
+  }
+  printf(<FONT COLOR="#BC8F8F"><B>&quot;\n&quot;</FONT></B>);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0 ; i &lt; 8 ; i++)
+  {
+    cpx aconvbi(0,0);
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> j = 0 ; j &lt; 8 ; j++)
+    {
+      aconvbi = aconvbi + a[j] * b[(8 + i - j) % 8];
+    }
+    printf(<FONT COLOR="#BC8F8F"><B>&quot;%7.2lf%7.2lf&quot;</FONT></B>, aconvbi.a, aconvbi.b);
+  }
+  printf(<FONT COLOR="#BC8F8F"><B>&quot;\n&quot;</FONT></B>);
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+
+</PRE>
+<HR>
+<A NAME="file17">
+<H1>Simplex.cc 17/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Two-phase simplex algorithm for solving linear programs of the form
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//     maximize     c^T x
+</FONT></I><I><FONT COLOR="#B22222">//     subject to   Ax &lt;= b
+</FONT></I><I><FONT COLOR="#B22222">//                  x &gt;= 0
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT: A -- an m x n matrix
+</FONT></I><I><FONT COLOR="#B22222">//        b -- an m-dimensional vector
+</FONT></I><I><FONT COLOR="#B22222">//        c -- an n-dimensional vector
+</FONT></I><I><FONT COLOR="#B22222">//        x -- a vector where the optimal solution will be stored
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT: value of the optimal solution (infinity if unbounded
+</FONT></I><I><FONT COLOR="#B22222">//         above, nan if infeasible)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// To use this code, create an LPSolver object with A, b, and c as
+</FONT></I><I><FONT COLOR="#B22222">// arguments.  Then, call Solve(x).
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iomanip&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;limits&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>double</FONT></B> DOUBLE;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;DOUBLE&gt; VD;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;VD&gt; VVD;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+
+<FONT COLOR="#228B22"><B>const</FONT></B> DOUBLE EPS = 1e-9;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> LPSolver {
+  <FONT COLOR="#228B22"><B>int</FONT></B> m, n;
+  VI B, N;
+  VVD D;
+
+  LPSolver(<FONT COLOR="#228B22"><B>const</FONT></B> VVD &amp;A, <FONT COLOR="#228B22"><B>const</FONT></B> VD &amp;b, <FONT COLOR="#228B22"><B>const</FONT></B> VD &amp;c) : 
+    m(b.size()), n(c.size()), N(n+1), B(m), D(m+2, VD(n+2)) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++) D[i][j] = A[i][j];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) { B[i] = n+i; D[i][n] = -1; D[i][n+1] = b[i]; }
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n; j++) { N[j] = j; D[m][j] = -c[j]; }
+    N[n] = -1; D[m+1][n] = 1;
+  }
+	   
+  <FONT COLOR="#228B22"><B>void</FONT></B> Pivot(<FONT COLOR="#228B22"><B>int</FONT></B> r, <FONT COLOR="#228B22"><B>int</FONT></B> s) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m+2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n+2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s)
+	D[i][j] -= D[r][j] * D[i][s] / D[r][s];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; n+2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s) D[r][j] /= D[r][s];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m+2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) D[i][s] /= -D[r][s];
+    D[r][s] = 1.0 / D[r][s];
+    swap(B[r], N[s]);
+  }
+
+  <FONT COLOR="#228B22"><B>bool</FONT></B> Simplex(<FONT COLOR="#228B22"><B>int</FONT></B> phase) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> x = phase == 1 ? m+1 : m;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (true) {
+      <FONT COLOR="#228B22"><B>int</FONT></B> s = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt;= n; j++) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (phase == 2 &amp;&amp; N[j] == -1) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+	<B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[x][j] &lt; D[x][s] || D[x][j] == D[x][s] &amp;&amp; N[j] &lt; N[s]) s = j;
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (D[x][s] &gt;= -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> true;
+      <FONT COLOR="#228B22"><B>int</FONT></B> r = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) {
+	<B><FONT COLOR="#A020F0">if</FONT></B> (D[i][s] &lt;= 0) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+	<B><FONT COLOR="#A020F0">if</FONT></B> (r == -1 || D[i][n+1] / D[i][s] &lt; D[r][n+1] / D[r][s] ||
+	    D[i][n+1] / D[i][s] == D[r][n+1] / D[r][s] &amp;&amp; B[i] &lt; B[r]) r = i;
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (r == -1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+      Pivot(r, s);
+    }
+  }
+
+  DOUBLE Solve(VD &amp;x) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> r = 0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 1; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (D[i][n+1] &lt; D[r][n+1]) r = i;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (D[r][n+1] &lt;= -EPS) {
+      Pivot(r, n);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(1) || D[m+1][n+1] &lt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> -numeric_limits&lt;DOUBLE&gt;::infinity();
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] == -1) {
+	<FONT COLOR="#228B22"><B>int</FONT></B> s = -1;
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt;= n; j++) 
+	  <B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[i][j] &lt; D[i][s] || D[i][j] == D[i][s] &amp;&amp; N[j] &lt; N[s]) s = j;
+	Pivot(i, s);
+      }
+    }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(2)) <B><FONT COLOR="#A020F0">return</FONT></B> numeric_limits&lt;DOUBLE&gt;::infinity();
+    x = VD(n);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] &lt; n) x[B[i]] = D[i][n+1];
+    <B><FONT COLOR="#A020F0">return</FONT></B> D[m][n+1];
+  }
+};
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> m = 4;
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n = 3;  
+  DOUBLE _A[m][n] = {
+    { 6, -1, 0 },
+    { -1, -5, 0 },
+    { 1, 5, 1 },
+    { -1, -5, -1 }
+  };
+  DOUBLE _b[m] = { 10, -4, 5, -5 };
+  DOUBLE _c[n] = { 1, -1, 0 };
+  
+  VVD A(m);
+  VD b(_b, _b + m);
+  VD c(_c, _c + n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; m; i++) A[i] = VD(_A[i], _A[i] + n);
+
+  LPSolver solver(A, b, c);
+  VD x;
+  DOUBLE value = solver.Solve(x);
+  
+  cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;VALUE: &quot;</FONT></B>&lt;&lt; value &lt;&lt; endl;
+  cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;SOLUTION:&quot;</FONT></B>;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (size_t i = 0; i &lt; x.size(); i++) cerr &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; x[i];
+  cerr &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+
+
+</PRE>
+<HR>
+<A NAME="file18">
+<H1>FastDijkstra.cc 18/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Implementation of Dijkstra's algorithm using adjacency lists
+</FONT></I><I><FONT COLOR="#B22222">// and priority queue for efficiency.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(|E| log |V|)
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;queue&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;stdio.h&gt;</FONT></B>
+
+using namespace std;
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> INF = 2000000000;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>,<FONT COLOR="#228B22"><B>int</FONT></B>&gt; PII;
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>(){
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> N, s, t;
+  scanf (<FONT COLOR="#BC8F8F"><B>&quot;%d%d%d&quot;</FONT></B>, &amp;N, &amp;s, &amp;t);
+  vector&lt;vector&lt;PII&gt; &gt; edges(N);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; N; i++){
+    <FONT COLOR="#228B22"><B>int</FONT></B> M;
+    scanf (<FONT COLOR="#BC8F8F"><B>&quot;%d&quot;</FONT></B>, &amp;M);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; M; j++){
+      <FONT COLOR="#228B22"><B>int</FONT></B> vertex, dist;
+      scanf (<FONT COLOR="#BC8F8F"><B>&quot;%d%d&quot;</FONT></B>, &amp;vertex, &amp;dist);
+      edges[i].push_back (make_pair (dist, vertex)); <I><FONT COLOR="#B22222">// note order of arguments here
+</FONT></I>    }
+  }
+  
+  <I><FONT COLOR="#B22222">// use priority queue in which top element has the &quot;smallest&quot; priority
+</FONT></I>  priority_queue&lt;PII, vector&lt;PII&gt;, greater&lt;PII&gt; &gt; Q;
+  vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; dist(N, INF), dad(N, -1);
+  Q.push (make_pair (0, s));
+  dist[s] = 0;
+  <B><FONT COLOR="#A020F0">while</FONT></B> (!Q.empty()){
+    PII p = Q.top();
+    <B><FONT COLOR="#A020F0">if</FONT></B> (p.second == t) <B><FONT COLOR="#A020F0">break</FONT></B>;
+    Q.pop();
+    
+    <FONT COLOR="#228B22"><B>int</FONT></B> here = p.second;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (vector&lt;PII&gt;::iterator it=edges[here].begin(); it!=edges[here].end(); it++){
+      <B><FONT COLOR="#A020F0">if</FONT></B> (dist[here] + it-&gt;first &lt; dist[it-&gt;second]){
+        dist[it-&gt;second] = dist[here] + it-&gt;first;
+        dad[it-&gt;second] = here;
+        Q.push (make_pair (dist[it-&gt;second], it-&gt;second));
+      }
+    }
+  }
+  
+  printf (<FONT COLOR="#BC8F8F"><B>&quot;%d\n&quot;</FONT></B>, dist[t]);
+  <B><FONT COLOR="#A020F0">if</FONT></B> (dist[t] &lt; INF)
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i=t;i!=-1;i=dad[i])
+      printf (<FONT COLOR="#BC8F8F"><B>&quot;%d%c&quot;</FONT></B>, i, (i==s?<FONT COLOR="#BC8F8F"><B>'\n'</FONT></B>:<FONT COLOR="#BC8F8F"><B>' '</FONT></B>));
+    
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file19">
+<H1>SCC.cc 19/34</H1>
+<PRE>
+#<B><FONT COLOR="#5F9EA0">include&lt;memory.h&gt;</FONT></B>
+<FONT COLOR="#228B22"><B>struct</FONT></B> edge{<FONT COLOR="#228B22"><B>int</FONT></B> e, nxt;};
+<FONT COLOR="#228B22"><B>int</FONT></B> V, E;
+edge e[MAXE], er[MAXE];
+<FONT COLOR="#228B22"><B>int</FONT></B> sp[MAXV], spr[MAXV];
+<FONT COLOR="#228B22"><B>int</FONT></B> group_cnt, group_num[MAXV];
+<FONT COLOR="#228B22"><B>bool</FONT></B> v[MAXV];
+<FONT COLOR="#228B22"><B>int</FONT></B> stk[MAXV];
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">fill_forward</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x)
+{
+  <FONT COLOR="#228B22"><B>int</FONT></B> i;
+  v[x]=true;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(i=sp[x];i;i=e[i].nxt) <B><FONT COLOR="#A020F0">if</FONT></B>(!v[e[i].e]) fill_forward(e[i].e);
+  stk[++stk[0]]=x;
+}
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">fill_backward</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x)
+{
+  <FONT COLOR="#228B22"><B>int</FONT></B> i;
+  v[x]=false;
+  group_num[x]=group_cnt;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(i=spr[x];i;i=er[i].nxt) <B><FONT COLOR="#A020F0">if</FONT></B>(v[er[i].e]) fill_backward(er[i].e);
+}
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">add_edge</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> v1, <FONT COLOR="#228B22"><B>int</FONT></B> v2) <I><FONT COLOR="#B22222">//add edge v1-&gt;v2
+</FONT></I>{
+  e [++E].e=v2; e [E].nxt=sp [v1]; sp [v1]=E;
+  er[  E].e=v1; er[E].nxt=spr[v2]; spr[v2]=E;
+}
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">SCC</FONT></B>()
+{
+  <FONT COLOR="#228B22"><B>int</FONT></B> i;
+  stk[0]=0;
+  memset(v, false, <B><FONT COLOR="#A020F0">sizeof</FONT></B>(v));
+  <B><FONT COLOR="#A020F0">for</FONT></B>(i=1;i&lt;=V;i++) <B><FONT COLOR="#A020F0">if</FONT></B>(!v[i]) fill_forward(i);
+  group_cnt=0;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(i=stk[0];i&gt;=1;i--) <B><FONT COLOR="#A020F0">if</FONT></B>(v[stk[i]]){group_cnt++; fill_backward(stk[i]);}
+}
+
+</PRE>
+<HR>
+<A NAME="file20">
+<H1>EulerianPath.cc 20/34</H1>
+<PRE>
+<FONT COLOR="#228B22"><B>struct</FONT></B> Edge;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> list&lt;Edge&gt;::iterator iter;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> Edge
+{
+	<FONT COLOR="#228B22"><B>int</FONT></B> next_vertex;
+	iter reverse_edge;
+
+	Edge(<FONT COLOR="#228B22"><B>int</FONT></B> next_vertex)
+		:next_vertex(next_vertex)
+		{ }
+};
+
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_vertices = ;
+<FONT COLOR="#228B22"><B>int</FONT></B> num_vertices;
+list&lt;Edge&gt; adj[max_vertices];		<I><FONT COLOR="#B22222">// adjacency list
+</FONT></I>
+vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; path;
+
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">find_path</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> v)
+{
+	<B><FONT COLOR="#A020F0">while</FONT></B>(adj[v].size() &gt; 0)
+	{
+		<FONT COLOR="#228B22"><B>int</FONT></B> vn = adj[v].front().next_vertex;
+		adj[vn].erase(adj[v].front().reverse_edge);
+		adj[v].pop_front();
+		find_path(vn);
+	}
+	path.push_back(v);
+}
+
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">add_edge</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> a, <FONT COLOR="#228B22"><B>int</FONT></B> b)
+{
+	adj[a].push_front(Edge(b));
+	iter ita = adj[a].begin();
+	adj[b].push_front(Edge(a));
+	iter itb = adj[b].begin();
+	ita-&gt;reverse_edge = itb;
+	itb-&gt;reverse_edge = ita;
+}
+</PRE>
+<HR>
+<A NAME="file21">
+<H1>SuffixArray.cc 21/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Suffix array construction in O(L log^2 L) time.  Routine for
+</FONT></I><I><FONT COLOR="#B22222">// computing the length of the longest common prefix of any two
+</FONT></I><I><FONT COLOR="#B22222">// suffixes in O(log L) time.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// INPUT:   string s
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// OUTPUT:  array suffix[] such that suffix[i] = index (from 0 to L-1)
+</FONT></I><I><FONT COLOR="#B22222">//          of substring s[i...L-1] in the list of sorted suffixes.
+</FONT></I><I><FONT COLOR="#B22222">//          That is, if we take the inverse of the permutation suffix[],
+</FONT></I><I><FONT COLOR="#B22222">//          we get the actual suffix array.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;string&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> SuffixArray {
+  <FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> L;
+  string s;
+  vector&lt;vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; &gt; P;
+  vector&lt;pair&lt;pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>,<FONT COLOR="#228B22"><B>int</FONT></B>&gt;,<FONT COLOR="#228B22"><B>int</FONT></B>&gt; &gt; M;
+
+  SuffixArray(<FONT COLOR="#228B22"><B>const</FONT></B> string &amp;s) : L(s.length()), s(s), P(1, vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt;(L, 0)), M(L) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; L; i++) P[0][i] = <FONT COLOR="#228B22"><B>int</FONT></B>(s[i]);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> skip = 1, level = 1; skip &lt; L; skip *= 2, level++) {
+      P.push_back(vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt;(L, 0));
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; L; i++) 
+	M[i] = make_pair(make_pair(P[level-1][i], i + skip &lt; L ? P[level-1][i + skip] : -1000), i);
+      sort(M.begin(), M.end());
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; L; i++) 
+	P[level][M[i].second] = (i &gt; 0 &amp;&amp; M[i].first == M[i-1].first) ? P[level][M[i-1].second] : i;
+    }    
+  }
+
+  vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; GetSuffixArray() { <B><FONT COLOR="#A020F0">return</FONT></B> P.back(); }
+
+  <I><FONT COLOR="#B22222">// returns the length of the longest common prefix of s[i...L-1] and s[j...L-1]
+</FONT></I>  <FONT COLOR="#228B22"><B>int</FONT></B> LongestCommonPrefix(<FONT COLOR="#228B22"><B>int</FONT></B> i, <FONT COLOR="#228B22"><B>int</FONT></B> j) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> len = 0;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (i == j) <B><FONT COLOR="#A020F0">return</FONT></B> L - i;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> k = P.size() - 1; k &gt;= 0 &amp;&amp; i &lt; L &amp;&amp; j &lt; L; k--) {
+      <B><FONT COLOR="#A020F0">if</FONT></B> (P[k][i] == P[k][j]) {
+	i += 1 &lt;&lt; k;
+	j += 1 &lt;&lt; k;
+	len += 1 &lt;&lt; k;
+      }
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> len;
+  }
+};
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
+
+  <I><FONT COLOR="#B22222">// bobocel is the 0'th suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//  obocel is the 5'th suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//   bocel is the 1'st suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//    ocel is the 6'th suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//     cel is the 2'nd suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//      el is the 3'rd suffix
+</FONT></I>  <I><FONT COLOR="#B22222">//       l is the 4'th suffix
+</FONT></I>  SuffixArray suffix(<FONT COLOR="#BC8F8F"><B>&quot;bobocel&quot;</FONT></B>);
+  vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; v = suffix.GetSuffixArray();
+  
+  <I><FONT COLOR="#B22222">// Expected output: 0 5 1 6 2 3 4
+</FONT></I>  <I><FONT COLOR="#B22222">//                  2
+</FONT></I>  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; v.size(); i++) cout &lt;&lt; v[i] &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B>;
+  cout &lt;&lt; endl;
+  cout &lt;&lt; suffix.LongestCommonPrefix(0, 2) &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file22">
+<H1>BIT.cc 22/34</H1>
+<PRE>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+using namespace std;
+
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">LOGSZ</FONT> 17
+
+<FONT COLOR="#228B22"><B>int</FONT></B> tree[(1&lt;&lt;LOGSZ)+1];
+<FONT COLOR="#228B22"><B>int</FONT></B> N = (1&lt;&lt;LOGSZ);
+
+<I><FONT COLOR="#B22222">// add v to value at x
+</FONT></I><FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">set</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x, <FONT COLOR="#228B22"><B>int</FONT></B> v) {
+  <B><FONT COLOR="#A020F0">while</FONT></B>(x &lt;= N) {
+    tree[x] += v;
+    x += (x &amp; -x);
+  }
+}
+
+<I><FONT COLOR="#B22222">// get cumulative sum up to and including x
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">get</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> res = 0;
+  <B><FONT COLOR="#A020F0">while</FONT></B>(x) {
+    res += tree[x];
+    x -= (x &amp; -x);
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> res;
+}
+
+<I><FONT COLOR="#B22222">// get largest value with cumulative sum less than or equal to x;
+</FONT></I><I><FONT COLOR="#B22222">// for smallest, pass x-1 and add 1 to result
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">getind</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x) {
+  <FONT COLOR="#228B22"><B>int</FONT></B> idx = 0, mask = N;
+  <B><FONT COLOR="#A020F0">while</FONT></B>(mask &amp;&amp; idx &lt; N) {
+    <FONT COLOR="#228B22"><B>int</FONT></B> t = idx + mask;
+    <B><FONT COLOR="#A020F0">if</FONT></B>(x &gt;= tree[t]) {
+      idx = t;
+      x -= tree[t];
+    }
+    mask &gt;&gt;= 1;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> idx;
+}
+</PRE>
+<HR>
+<A NAME="file23">
+<H1>UnionFind.cc 23/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">//union-find set: the vector/array contains the parent of each node
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">find</FONT></B>(vector &lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt;&amp; C, <FONT COLOR="#228B22"><B>int</FONT></B> x){<B><FONT COLOR="#A020F0">return</FONT></B> (C[x]==x) ? x : C[x]=find(C, C[x]);} <I><FONT COLOR="#B22222">//C++
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">find</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> x){<B><FONT COLOR="#A020F0">return</FONT></B> (C[x]==x)?<B><FONT COLOR="#5F9EA0">x</FONT></B>:C[x]=find(C[x]);} <I><FONT COLOR="#B22222">//C
+</FONT></I></PRE>
+<HR>
+<A NAME="file24">
+<H1>KDTree.cc 24/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// --------------------------------------------------------------------------
+</FONT></I><I><FONT COLOR="#B22222">// A straightforward, but probably sub-optimal KD-tree implmentation that's
+</FONT></I><I><FONT COLOR="#B22222">// probably good enough for most things (current it's a 2D-tree)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//  - constructs from n points in O(n lg^2 n) time
+</FONT></I><I><FONT COLOR="#B22222">//  - handles nearest-neighbor query in O(lg n) if points are well distributed
+</FONT></I><I><FONT COLOR="#B22222">//  - worst case for nearest-neighbor may be linear in pathological case
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Sonny Chan, Stanford University, April 2009
+</FONT></I><I><FONT COLOR="#B22222">// --------------------------------------------------------------------------
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;limits&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cstdlib&gt;</FONT></B>
+
+using namespace std;
+
+<I><FONT COLOR="#B22222">// number type for coordinates, and its maximum value
+</FONT></I><FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> ntype;
+<FONT COLOR="#228B22"><B>const</FONT></B> ntype sentry = numeric_limits&lt;ntype&gt;::max();
+
+<I><FONT COLOR="#B22222">// point structure for 2D-tree, can be extended to 3D
+</FONT></I><FONT COLOR="#228B22"><B>struct</FONT></B> point {
+    ntype x, y;
+    point(ntype xx = 0, ntype yy = 0) : x(xx), y(yy) {}
+};
+
+<FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>==(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;a, <FONT COLOR="#228B22"><B>const</FONT></B> point &amp;b)
+{
+    <B><FONT COLOR="#A020F0">return</FONT></B> a.x == b.x &amp;&amp; a.y == b.y;
+}
+
+<I><FONT COLOR="#B22222">// sorts points on x-coordinate
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">on_x</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;a, <FONT COLOR="#228B22"><B>const</FONT></B> point &amp;b)
+{
+    <B><FONT COLOR="#A020F0">return</FONT></B> a.x &lt; b.x;
+}
+
+<I><FONT COLOR="#B22222">// sorts points on y-coordinate
+</FONT></I><FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">on_y</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;a, <FONT COLOR="#228B22"><B>const</FONT></B> point &amp;b)
+{
+    <B><FONT COLOR="#A020F0">return</FONT></B> a.y &lt; b.y;
+}
+
+<I><FONT COLOR="#B22222">// squared distance between points
+</FONT></I>ntype <B><FONT COLOR="#0000FF">pdist2</FONT></B>(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;a, <FONT COLOR="#228B22"><B>const</FONT></B> point &amp;b)
+{
+    ntype dx = a.x-b.x, dy = a.y-b.y;
+    <B><FONT COLOR="#A020F0">return</FONT></B> dx*dx + dy*dy;
+}
+
+<I><FONT COLOR="#B22222">// bounding box for a set of points
+</FONT></I><FONT COLOR="#228B22"><B>struct</FONT></B> bbox
+{
+    ntype x0, x1, y0, y1;
+    
+    bbox() : x0(sentry), x1(-sentry), y0(sentry), y1(-sentry) {}
+    
+    <I><FONT COLOR="#B22222">// computes bounding box from a bunch of points
+</FONT></I>    <FONT COLOR="#228B22"><B>void</FONT></B> compute(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;point&gt; &amp;v) {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; v.size(); ++i) {
+            x0 = min(x0, v[i].x);   x1 = max(x1, v[i].x);
+            y0 = min(y0, v[i].y);   y1 = max(y1, v[i].y);
+        }
+    }
+    
+    <I><FONT COLOR="#B22222">// squared distance between a point and this bbox, 0 if inside
+</FONT></I>    ntype distance(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;p) {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (p.x &lt; x0) {
+            <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &lt; y0)       <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x0, y0), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &gt; y1)  <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x0, y1), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B>                <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x0, p.y), p);
+        }
+        <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (p.x &gt; x1) {
+            <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &lt; y0)       <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x1, y0), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &gt; y1)  <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x1, y1), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B>                <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(x1, p.y), p);
+        }
+        <B><FONT COLOR="#A020F0">else</FONT></B> {
+            <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &lt; y0)       <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(p.x, y0), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (p.y &gt; y1)  <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(point(p.x, y1), p);
+            <B><FONT COLOR="#A020F0">else</FONT></B>                <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+        }
+    }
+};
+
+<I><FONT COLOR="#B22222">// stores a single node of the kd-tree, either internal or leaf
+</FONT></I><FONT COLOR="#228B22"><B>struct</FONT></B> kdnode 
+{
+    <FONT COLOR="#228B22"><B>bool</FONT></B> leaf;      <I><FONT COLOR="#B22222">// true if this is a leaf node (has one point)
+</FONT></I>    point pt;       <I><FONT COLOR="#B22222">// the single point of this is a leaf
+</FONT></I>    bbox bound;     <I><FONT COLOR="#B22222">// bounding box for set of points in children
+</FONT></I>    
+    kdnode *first, *second; <I><FONT COLOR="#B22222">// two children of this kd-node
+</FONT></I>    
+    kdnode() : leaf(false), first(0), second(0) {}
+    ~kdnode() { <B><FONT COLOR="#A020F0">if</FONT></B> (first) <B><FONT COLOR="#A020F0">delete</FONT></B> first; <B><FONT COLOR="#A020F0">if</FONT></B> (second) <B><FONT COLOR="#A020F0">delete</FONT></B> second; }
+    
+    <I><FONT COLOR="#B22222">// intersect a point with this node (returns squared distance)
+</FONT></I>    ntype intersect(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;p) {
+        <B><FONT COLOR="#A020F0">return</FONT></B> bound.distance(p);
+    }
+    
+    <I><FONT COLOR="#B22222">// recursively builds a kd-tree from a given cloud of points
+</FONT></I>    <FONT COLOR="#228B22"><B>void</FONT></B> construct(vector&lt;point&gt; &amp;vp)
+    {
+        <I><FONT COLOR="#B22222">// compute bounding box for points at this node
+</FONT></I>        bound.compute(vp);
+        
+        <I><FONT COLOR="#B22222">// if we're down to one point, then we're a leaf node
+</FONT></I>        <B><FONT COLOR="#A020F0">if</FONT></B> (vp.size() == 1) {
+            leaf = true;
+            pt = vp[0];
+        }
+        <B><FONT COLOR="#A020F0">else</FONT></B> {
+            <I><FONT COLOR="#B22222">// split on x if the bbox is wider than high (not best heuristic...)
+</FONT></I>            <B><FONT COLOR="#A020F0">if</FONT></B> (bound.x1-bound.x0 &gt;= bound.y1-bound.y0)
+                sort(vp.begin(), vp.end(), on_x);
+            <I><FONT COLOR="#B22222">// otherwise split on y-coordinate
+</FONT></I>            <B><FONT COLOR="#A020F0">else</FONT></B>
+                sort(vp.begin(), vp.end(), on_y);
+            
+            <I><FONT COLOR="#B22222">// divide by taking half the array for each child
+</FONT></I>            <I><FONT COLOR="#B22222">// (not best performance if many duplicates in the middle)
+</FONT></I>            <FONT COLOR="#228B22"><B>int</FONT></B> half = vp.size()/2;
+            vector&lt;point&gt; vl(vp.begin(), vp.begin()+half);
+            vector&lt;point&gt; vr(vp.begin()+half, vp.end());
+            first = <B><FONT COLOR="#A020F0">new</FONT></B> kdnode();   first-&gt;construct(vl);
+            second = <B><FONT COLOR="#A020F0">new</FONT></B> kdnode();  second-&gt;construct(vr);            
+        }
+    }
+};
+
+<I><FONT COLOR="#B22222">// simple kd-tree class to hold the tree and handle queries
+</FONT></I><FONT COLOR="#228B22"><B>struct</FONT></B> kdtree
+{
+    kdnode *root;
+    
+    <I><FONT COLOR="#B22222">// constructs a kd-tree from a points (copied here, as it sorts them)
+</FONT></I>    kdtree(<FONT COLOR="#228B22"><B>const</FONT></B> vector&lt;point&gt; &amp;vp) {
+        vector&lt;point&gt; v(vp.begin(), vp.end());
+        root = <B><FONT COLOR="#A020F0">new</FONT></B> kdnode();
+        root-&gt;construct(v);
+    }
+    ~kdtree() { <B><FONT COLOR="#A020F0">delete</FONT></B> root; }
+    
+    <I><FONT COLOR="#B22222">// recursive search method returns squared distance to nearest point
+</FONT></I>    ntype search(kdnode *node, <FONT COLOR="#228B22"><B>const</FONT></B> point &amp;p)
+    {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (node-&gt;leaf) {
+            <I><FONT COLOR="#B22222">// commented special case tells a point not to find itself
+</FONT></I><I><FONT COLOR="#B22222">//            if (p == node-&gt;pt) return sentry;
+</FONT></I><I><FONT COLOR="#B22222">//            else               
+</FONT></I>                <B><FONT COLOR="#A020F0">return</FONT></B> pdist2(p, node-&gt;pt);
+        }
+        
+        ntype bfirst = node-&gt;first-&gt;intersect(p);
+        ntype bsecond = node-&gt;second-&gt;intersect(p);
+        
+        <I><FONT COLOR="#B22222">// choose the side with the closest bounding box to search first
+</FONT></I>        <I><FONT COLOR="#B22222">// (note that the other side is also searched if needed)
+</FONT></I>        <B><FONT COLOR="#A020F0">if</FONT></B> (bfirst &lt; bsecond) {
+            ntype best = search(node-&gt;first, p);
+            <B><FONT COLOR="#A020F0">if</FONT></B> (bsecond &lt; best)
+                best = min(best, search(node-&gt;second, p));
+            <B><FONT COLOR="#A020F0">return</FONT></B> best;
+        }
+        <B><FONT COLOR="#A020F0">else</FONT></B> {
+            ntype best = search(node-&gt;second, p);
+            <B><FONT COLOR="#A020F0">if</FONT></B> (bfirst &lt; best)
+                best = min(best, search(node-&gt;first, p));
+            <B><FONT COLOR="#A020F0">return</FONT></B> best;
+        }
+    }
+    
+    <I><FONT COLOR="#B22222">// squared distance to the nearest 
+</FONT></I>    ntype nearest(<FONT COLOR="#228B22"><B>const</FONT></B> point &amp;p) {
+        <B><FONT COLOR="#A020F0">return</FONT></B> search(root, p);
+    }
+};
+
+<I><FONT COLOR="#B22222">// --------------------------------------------------------------------------
+</FONT></I><I><FONT COLOR="#B22222">// some basic test code here
+</FONT></I>
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+    <I><FONT COLOR="#B22222">// generate some random points for a kd-tree
+</FONT></I>    vector&lt;point&gt; vp;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; 100000; ++i) {
+        vp.push_back(point(rand()%100000, rand()%100000));
+    }
+    kdtree tree(vp);
+    
+    <I><FONT COLOR="#B22222">// query some points
+</FONT></I>    <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; 10; ++i) {
+        point q(rand()%100000, rand()%100000);
+        cout &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;Closest squared distance to (&quot;</FONT></B> &lt;&lt; q.x &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;, &quot;</FONT></B> &lt;&lt; q.y &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>
+             &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; is &quot;</FONT></B> &lt;&lt; tree.nearest(q) &lt;&lt; endl;
+    }    
+
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+
+<I><FONT COLOR="#B22222">// --------------------------------------------------------------------------
+</FONT></I></PRE>
+<HR>
+<A NAME="file25">
+<H1>SegmentTreeLazy.java 25/34</H1>
+<PRE>
+<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> SegmentTreeRangeUpdate {
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B>[] leaf;
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B>[] update;
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">int</FONT></B> origSize;
+	<B><FONT COLOR="#A020F0">public</FONT></B> SegmentTreeRangeUpdate(<B><FONT COLOR="#A020F0">int</FONT></B>[] list)	{
+		origSize = list.length;
+		leaf = <B><FONT COLOR="#A020F0">new</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B>[4*list.length];
+		update = <B><FONT COLOR="#A020F0">new</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B>[4*list.length];
+		build(1,0,list.length-1,list);
+	}
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> build(<B><FONT COLOR="#A020F0">int</FONT></B> curr, <B><FONT COLOR="#A020F0">int</FONT></B> begin, <B><FONT COLOR="#A020F0">int</FONT></B> end, <B><FONT COLOR="#A020F0">int</FONT></B>[] list)	{
+		<B><FONT COLOR="#A020F0">if</FONT></B>(begin == end)
+			leaf[curr] = list[begin];
+		<B><FONT COLOR="#A020F0">else</FONT></B>	{
+			<B><FONT COLOR="#A020F0">int</FONT></B> mid = (begin+end)/2;
+			build(2 * curr, begin, mid, list);
+			build(2 * curr + 1, mid+1, end, list);
+			leaf[curr] = leaf[2*curr] + leaf[2*curr+1];
+		}
+	}
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> update(<B><FONT COLOR="#A020F0">int</FONT></B> begin, <B><FONT COLOR="#A020F0">int</FONT></B> end, <B><FONT COLOR="#A020F0">int</FONT></B> val)	{
+		update(1,0,origSize-1,begin,end,val);
+	}
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> update(<B><FONT COLOR="#A020F0">int</FONT></B> curr,  <B><FONT COLOR="#A020F0">int</FONT></B> tBegin, <B><FONT COLOR="#A020F0">int</FONT></B> tEnd, <B><FONT COLOR="#A020F0">int</FONT></B> begin, <B><FONT COLOR="#A020F0">int</FONT></B> end, <B><FONT COLOR="#A020F0">int</FONT></B> val)	{
+		<B><FONT COLOR="#A020F0">if</FONT></B>(tBegin &gt;= begin &amp;&amp; tEnd &lt;= end)
+			update[curr] += val;
+		<B><FONT COLOR="#A020F0">else</FONT></B>	{
+			leaf[curr] += (Math.min(end,tEnd)-Math.max(begin,tBegin)+1) * val;
+			<B><FONT COLOR="#A020F0">int</FONT></B> mid = (tBegin+tEnd)/2;
+			<B><FONT COLOR="#A020F0">if</FONT></B>(mid &gt;= begin &amp;&amp; tBegin &lt;= end)
+				update(2*curr, tBegin, mid, begin, end, val);
+			<B><FONT COLOR="#A020F0">if</FONT></B>(tEnd &gt;= begin &amp;&amp; mid+1 &lt;= end)
+				update(2*curr+1, mid+1, tEnd, begin, end, val);
+		}
+	}
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B> query(<B><FONT COLOR="#A020F0">int</FONT></B> begin, <B><FONT COLOR="#A020F0">int</FONT></B> end)	{
+		<B><FONT COLOR="#A020F0">return</FONT></B> query(1,0,origSize-1,begin,end);
+	}
+	<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">long</FONT></B> query(<B><FONT COLOR="#A020F0">int</FONT></B> curr, <B><FONT COLOR="#A020F0">int</FONT></B> tBegin, <B><FONT COLOR="#A020F0">int</FONT></B> tEnd, <B><FONT COLOR="#A020F0">int</FONT></B> begin, <B><FONT COLOR="#A020F0">int</FONT></B> end)	{
+		<B><FONT COLOR="#A020F0">if</FONT></B>(tBegin &gt;= begin &amp;&amp; tEnd &lt;= end)	{
+			<B><FONT COLOR="#A020F0">if</FONT></B>(update[curr] != 0)	{
+				leaf[curr] += (tEnd-tBegin+1) * update[curr];
+				<B><FONT COLOR="#A020F0">if</FONT></B>(2*curr &lt; update.length){
+					update[2*curr] += update[curr];
+					update[2*curr+1] += update[curr];
+				}
+				update[curr] = 0;
+			}
+			<B><FONT COLOR="#A020F0">return</FONT></B> leaf[curr];
+		}
+		<B><FONT COLOR="#A020F0">else</FONT></B>	{
+			leaf[curr] += (tEnd-tBegin+1) * update[curr];
+			<B><FONT COLOR="#A020F0">if</FONT></B>(2*curr &lt; update.length){
+				update[2*curr] += update[curr];
+				update[2*curr+1] += update[curr];
+			}
+			update[curr] = 0;
+			<B><FONT COLOR="#A020F0">int</FONT></B> mid = (tBegin+tEnd)/2;
+			<B><FONT COLOR="#A020F0">long</FONT></B> ret = 0;
+			<B><FONT COLOR="#A020F0">if</FONT></B>(mid &gt;= begin &amp;&amp; tBegin &lt;= end)
+				ret += query(2*curr, tBegin, mid, begin, end);
+			<B><FONT COLOR="#A020F0">if</FONT></B>(tEnd &gt;= begin &amp;&amp; mid+1 &lt;= end)
+				ret += query(2*curr+1, mid+1, tEnd, begin, end);
+			<B><FONT COLOR="#A020F0">return</FONT></B> ret;
+		}
+	}
+}
+</PRE>
+<HR>
+<A NAME="file26">
+<H1>LCA.cc 26/34</H1>
+<PRE>
+<FONT COLOR="#228B22"><B>const</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> max_nodes, log_max_nodes;
+<FONT COLOR="#228B22"><B>int</FONT></B> num_nodes, log_num_nodes, root;
+
+vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; children[max_nodes];	<I><FONT COLOR="#B22222">// children[i] contains the children of node i
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> A[max_nodes][log_max_nodes+1];	<I><FONT COLOR="#B22222">// A[i][j] is the 2^j-th ancestor of node i, or -1 if that ancestor does not exist
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> L[max_nodes];			<I><FONT COLOR="#B22222">// L[i] is the distance between node i and the root
+</FONT></I>
+<I><FONT COLOR="#B22222">// floor of the binary logarithm of n
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">lb</FONT></B>(<FONT COLOR="#228B22"><B>unsigned</FONT></B> <FONT COLOR="#228B22"><B>int</FONT></B> n)
+{
+    <B><FONT COLOR="#A020F0">if</FONT></B>(n==0)
+	<B><FONT COLOR="#A020F0">return</FONT></B> -1;
+    <FONT COLOR="#228B22"><B>int</FONT></B> p = 0;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (n &gt;= 1&lt;&lt;16) { n &gt;&gt;= 16; p += 16; }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (n &gt;= 1&lt;&lt; 8) { n &gt;&gt;=  8; p +=  8; }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (n &gt;= 1&lt;&lt; 4) { n &gt;&gt;=  4; p +=  4; }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (n &gt;= 1&lt;&lt; 2) { n &gt;&gt;=  2; p +=  2; }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (n &gt;= 1&lt;&lt; 1) {           p +=  1; }
+    <B><FONT COLOR="#A020F0">return</FONT></B> p;
+}
+
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">DFS</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i, <FONT COLOR="#228B22"><B>int</FONT></B> l)
+{
+    L[i] = l;
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> j = 0; j &lt; children[i].size(); j++)
+	DFS(children[i][j], l+1);
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">LCA</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> p, <FONT COLOR="#228B22"><B>int</FONT></B> q)
+{
+    <I><FONT COLOR="#B22222">// ensure node p is at least as deep as node q
+</FONT></I>    <B><FONT COLOR="#A020F0">if</FONT></B>(L[p] &lt; L[q])
+	swap(p, q);
+
+    <I><FONT COLOR="#B22222">// &quot;binary search&quot; for the ancestor of node p situated on the same level as q
+</FONT></I>    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = log_num_nodes; i &gt;= 0; i--)
+	<B><FONT COLOR="#A020F0">if</FONT></B>(L[p] - (1&lt;&lt;i) &gt;= L[q])
+	    p = A[p][i];
+    
+    <B><FONT COLOR="#A020F0">if</FONT></B>(p == q)
+	<B><FONT COLOR="#A020F0">return</FONT></B> p;
+
+    <I><FONT COLOR="#B22222">// &quot;binary search&quot; for the LCA
+</FONT></I>    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = log_num_nodes; i &gt;= 0; i--)
+	<B><FONT COLOR="#A020F0">if</FONT></B>(A[p][i] != -1 &amp;&amp; A[p][i] != A[q][i])
+	{
+	    p = A[p][i];
+	    q = A[q][i];
+	}
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> A[p][0];
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> argc,<FONT COLOR="#228B22"><B>char</FONT></B>* argv[])
+{
+    <I><FONT COLOR="#B22222">// read num_nodes, the total number of nodes
+</FONT></I>    log_num_nodes=lb(num_nodes);
+    
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; num_nodes; i++)
+    {
+	<FONT COLOR="#228B22"><B>int</FONT></B> p;
+	<I><FONT COLOR="#B22222">// read p, the parent of node i or -1 if node i is the root
+</FONT></I>
+	A[i][0] = p;
+	<B><FONT COLOR="#A020F0">if</FONT></B>(p != -1)
+	    children[p].push_back(i);
+	<B><FONT COLOR="#A020F0">else</FONT></B>
+	    root = i;
+    }
+
+    <I><FONT COLOR="#B22222">// precompute A using dynamic programming
+</FONT></I>    <B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> j = 1; j &lt;= log_num_nodes; j++)
+	<B><FONT COLOR="#A020F0">for</FONT></B>(<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; num_nodes; i++)
+	    <B><FONT COLOR="#A020F0">if</FONT></B>(A[i][j-1] != -1)
+		A[i][j] = A[A[i][j-1]][j-1];
+	    <B><FONT COLOR="#A020F0">else</FONT></B>
+		A[i][j] = -1;
+
+    <I><FONT COLOR="#B22222">// precompute L
+</FONT></I>    DFS(root, 0);
+
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file27">
+<H1>LongestIncreasingSubsequence.cc 27/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Given a list of numbers of length n, this routine extracts a 
+</FONT></I><I><FONT COLOR="#B22222">// longest increasing subsequence.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n log n)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   INPUT: a vector of integers
+</FONT></I><I><FONT COLOR="#B22222">//   OUTPUT: a vector containing the longest increasing subsequence
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;algorithm&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> pair&lt;<FONT COLOR="#228B22"><B>int</FONT></B>,<FONT COLOR="#228B22"><B>int</FONT></B>&gt; PII;
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;PII&gt; VPII;
+
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">STRICTLY_INCREASNG</FONT>
+
+VI <B><FONT COLOR="#0000FF">LongestIncreasingSubsequence</FONT></B>(VI v) {
+  VPII best;
+  VI dad(v.size(), -1);
+  
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = 0; i &lt; v.size(); i++) {
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">STRICTLY_INCREASNG</FONT>
+    PII item = make_pair(v[i], 0);
+    VPII::iterator it = lower_bound(best.begin(), best.end(), item);
+    item.second = i;
+#<B><FONT COLOR="#5F9EA0">else</FONT></B>
+    PII item = make_pair(v[i], i);
+    VPII::iterator it = upper_bound(best.begin(), best.end(), item);
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+    <B><FONT COLOR="#A020F0">if</FONT></B> (it == best.end()) {
+      dad[i] = (best.size() == 0 ? -1 : best.back().second);
+      best.push_back(item);
+    } <B><FONT COLOR="#A020F0">else</FONT></B> {
+      dad[i] = dad[it-&gt;second];
+      *it = item;
+    }
+  }
+  
+  VI ret;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> i = best.back().second; i &gt;= 0; i = dad[i])
+    ret.push_back(v[i]);
+  reverse(ret.begin(), ret.end());
+  <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+</PRE>
+<HR>
+<A NAME="file28">
+<H1>Dates.cc 28/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Routines for performing computations on dates.  In these routines,
+</FONT></I><I><FONT COLOR="#B22222">// months are expressed as integers from 1 to 12, days are expressed
+</FONT></I><I><FONT COLOR="#B22222">// as integers from 1 to 31, and years are expressed as 4-digit
+</FONT></I><I><FONT COLOR="#B22222">// integers.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;string&gt;</FONT></B>
+
+using namespace std;
+
+string dayOfWeek[] = {<FONT COLOR="#BC8F8F"><B>&quot;Mon&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Tue&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Wed&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Thu&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Fri&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Sat&quot;</FONT></B>, <FONT COLOR="#BC8F8F"><B>&quot;Sun&quot;</FONT></B>};
+
+<I><FONT COLOR="#B22222">// converts Gregorian date to integer (Julian day number)
+</FONT></I><FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">dateToInt</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> m, <FONT COLOR="#228B22"><B>int</FONT></B> d, <FONT COLOR="#228B22"><B>int</FONT></B> y){  
+  <B><FONT COLOR="#A020F0">return</FONT></B> 
+    1461 * (y + 4800 + (m - 14) / 12) / 4 +
+    367 * (m - 2 - (m - 14) / 12 * 12) / 12 - 
+    3 * ((y + 4900 + (m - 14) / 12) / 100) / 4 + 
+    d - 32075;
+}
+
+<I><FONT COLOR="#B22222">// converts integer (Julian day number) to Gregorian date: month/day/year
+</FONT></I><FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">intToDate</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> jd, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;m, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;d, <FONT COLOR="#228B22"><B>int</FONT></B> &amp;y){
+  <FONT COLOR="#228B22"><B>int</FONT></B> x, n, i, j;
+  
+  x = jd + 68569;
+  n = 4 * x / 146097;
+  x -= (146097 * n + 3) / 4;
+  i = (4000 * (x + 1)) / 1461001;
+  x -= 1461 * i / 4 - 31;
+  j = 80 * x / 2447;
+  d = x - 2447 * j / 80;
+  x = j / 11;
+  m = j + 2 - 12 * x;
+  y = 100 * (n - 49) + i + x;
+}
+
+<I><FONT COLOR="#B22222">// converts integer (Julian day number) to day of week
+</FONT></I>string <B><FONT COLOR="#0000FF">intToDay</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> jd){
+  <B><FONT COLOR="#A020F0">return</FONT></B> dayOfWeek[jd % 7];
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B> (<FONT COLOR="#228B22"><B>int</FONT></B> argc, <FONT COLOR="#228B22"><B>char</FONT></B> **argv){
+  <FONT COLOR="#228B22"><B>int</FONT></B> jd = dateToInt (3, 24, 2004);
+  <FONT COLOR="#228B22"><B>int</FONT></B> m, d, y;
+  intToDate (jd, m, d, y);
+  string day = intToDay (jd);
+  
+  <I><FONT COLOR="#B22222">// expected output:
+</FONT></I>  <I><FONT COLOR="#B22222">//    2453089
+</FONT></I>  <I><FONT COLOR="#B22222">//    3/24/2004
+</FONT></I>  <I><FONT COLOR="#B22222">//    Wed
+</FONT></I>  cout &lt;&lt; jd &lt;&lt; endl
+    &lt;&lt; m &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;/&quot;</FONT></B> &lt;&lt; d &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;/&quot;</FONT></B> &lt;&lt; y &lt;&lt; endl
+    &lt;&lt; day &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file29">
+<H1>LogLan.java 29/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// Code which demonstrates the use of Java's regular expression libraries.
+</FONT></I><I><FONT COLOR="#B22222">// This is a solution for 
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   Loglan: a logical language
+</FONT></I><I><FONT COLOR="#B22222">//   http://acm.uva.es/p/v1/134.html
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// In this problem, we are given a regular language, whose rules can be
+</FONT></I><I><FONT COLOR="#B22222">// inferred directly from the code.  For each sentence in the input, we must
+</FONT></I><I><FONT COLOR="#B22222">// determine whether the sentence matches the regular expression or not.  The
+</FONT></I><I><FONT COLOR="#B22222">// code consists of (1) building the regular expression (which is fairly
+</FONT></I><I><FONT COLOR="#B22222">// complex) and (2) using the regex to match sentences.
+</FONT></I>
+<B><FONT COLOR="#A020F0">import</FONT></B> java.util.*;
+<B><FONT COLOR="#A020F0">import</FONT></B> java.util.regex.*;
+
+<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> LogLan {
+
+    <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> String BuildRegex (){
+	String space = <FONT COLOR="#BC8F8F"><B>&quot; +&quot;</FONT></B>;
+
+	String A = <FONT COLOR="#BC8F8F"><B>&quot;([aeiou])&quot;</FONT></B>;
+	String C = <FONT COLOR="#BC8F8F"><B>&quot;([a-z&amp;&amp;[^aeiou]])&quot;</FONT></B>;
+	String MOD = <FONT COLOR="#BC8F8F"><B>&quot;(g&quot;</FONT></B> + A + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String BA = <FONT COLOR="#BC8F8F"><B>&quot;(b&quot;</FONT></B> + A + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String DA = <FONT COLOR="#BC8F8F"><B>&quot;(d&quot;</FONT></B> + A + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String LA = <FONT COLOR="#BC8F8F"><B>&quot;(l&quot;</FONT></B> + A + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String NAM = <FONT COLOR="#BC8F8F"><B>&quot;([a-z]*&quot;</FONT></B> + C + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String PREDA = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + C + C + A + C + A + <FONT COLOR="#BC8F8F"><B>&quot;|&quot;</FONT></B> + C + A + C + C + A + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+
+	String predstring = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + PREDA + <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + space + PREDA + <FONT COLOR="#BC8F8F"><B>&quot;)*)&quot;</FONT></B>;
+	String predname = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + LA + space + predstring + <FONT COLOR="#BC8F8F"><B>&quot;|&quot;</FONT></B> + NAM + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String preds = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + predstring + <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + space + A + space + predstring + <FONT COLOR="#BC8F8F"><B>&quot;)*)&quot;</FONT></B>;
+	String predclaim = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + predname + space + BA + space + preds + <FONT COLOR="#BC8F8F"><B>&quot;|&quot;</FONT></B> + DA + space +
+            preds + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String verbpred = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + MOD + space + predstring + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String statement = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + predname + space + verbpred + space + predname + <FONT COLOR="#BC8F8F"><B>&quot;|&quot;</FONT></B> + 
+            predname + space + verbpred + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+	String sentence = <FONT COLOR="#BC8F8F"><B>&quot;(&quot;</FONT></B> + statement + <FONT COLOR="#BC8F8F"><B>&quot;|&quot;</FONT></B> + predclaim + <FONT COLOR="#BC8F8F"><B>&quot;)&quot;</FONT></B>;
+
+	<B><FONT COLOR="#A020F0">return</FONT></B> <FONT COLOR="#BC8F8F"><B>&quot;^&quot;</FONT></B> + sentence + <FONT COLOR="#BC8F8F"><B>&quot;$&quot;</FONT></B>;
+    }
+
+    <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> main (String args[]){
+
+	String regex = BuildRegex();
+	Pattern pattern = Pattern.compile (regex);
+	
+	Scanner s = <B><FONT COLOR="#A020F0">new</FONT></B> Scanner(System.in);
+	<B><FONT COLOR="#A020F0">while</FONT></B> (<B><FONT COLOR="#A020F0">true</FONT></B>) {
+
+            <I><FONT COLOR="#B22222">// In this problem, each sentence consists of multiple lines, where the last 
+</FONT></I>	    <I><FONT COLOR="#B22222">// line is terminated by a period.  The code below reads lines until
+</FONT></I>	    <I><FONT COLOR="#B22222">// encountering a line whose final character is a '.'.  Note the use of
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.length() to get length of string
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.charAt() to extract characters from a Java string
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.trim() to remove whitespace from the beginning and end of Java string
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">// Other useful String manipulation methods include
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.compareTo(t) &lt; 0 if s &lt; t, lexicographically
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.indexOf(&quot;apple&quot;) returns index of first occurrence of &quot;apple&quot; in s
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.lastIndexOf(&quot;apple&quot;) returns index of last occurrence of &quot;apple&quot; in s
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.replace(c,d) replaces occurrences of character c with d
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.startsWith(&quot;apple) returns (s.indexOf(&quot;apple&quot;) == 0)
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.toLowerCase() / s.toUpperCase() returns a new lower/uppercased string
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    Integer.parseInt(s) converts s to an integer (32-bit)
+</FONT></I>            <I><FONT COLOR="#B22222">//    Long.parseLong(s) converts s to a long (64-bit)
+</FONT></I>            <I><FONT COLOR="#B22222">//    Double.parseDouble(s) converts s to a double
+</FONT></I>            
+	    String sentence = <FONT COLOR="#BC8F8F"><B>&quot;&quot;</FONT></B>;
+	    <B><FONT COLOR="#A020F0">while</FONT></B> (<B><FONT COLOR="#A020F0">true</FONT></B>){
+		sentence = (sentence + <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> + s.nextLine()).trim();
+		<B><FONT COLOR="#A020F0">if</FONT></B> (sentence.equals(<FONT COLOR="#BC8F8F"><B>&quot;#&quot;</FONT></B>)) <B><FONT COLOR="#A020F0">return</FONT></B>;
+		<B><FONT COLOR="#A020F0">if</FONT></B> (sentence.charAt(sentence.length()-1) == <FONT COLOR="#BC8F8F"><B>'.'</FONT></B>) <B><FONT COLOR="#A020F0">break</FONT></B>;		
+	    }
+
+            <I><FONT COLOR="#B22222">// now, we remove the period, and match the regular expression
+</FONT></I>
+            String removed_period = sentence.substring(0, sentence.length()-1).trim();
+	    <B><FONT COLOR="#A020F0">if</FONT></B> (pattern.matcher (removed_period).find()){
+		System.out.println (<FONT COLOR="#BC8F8F"><B>&quot;Good&quot;</FONT></B>);
+	    } <B><FONT COLOR="#A020F0">else</FONT></B> {
+		System.out.println (<FONT COLOR="#BC8F8F"><B>&quot;Bad!&quot;</FONT></B>);
+	    }
+	}
+    }
+}
+</PRE>
+<HR>
+<A NAME="file30">
+<H1>Primes.cc 30/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">// O(sqrt(x)) Exhaustive Primality Test
+</FONT></I>#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">EPS</FONT> 1e-7
+<FONT COLOR="#228B22"><B>typedef</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> <FONT COLOR="#228B22"><B>long</FONT></B> LL;
+<FONT COLOR="#228B22"><B>bool</FONT></B> <B><FONT COLOR="#0000FF">IsPrimeSlow</FONT></B> (LL x)
+{
+  <B><FONT COLOR="#A020F0">if</FONT></B>(x&lt;=1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  <B><FONT COLOR="#A020F0">if</FONT></B>(x&lt;=3) <B><FONT COLOR="#A020F0">return</FONT></B> true;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (!(x%2) || !(x%3)) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  LL s=(LL)(sqrt((<FONT COLOR="#228B22"><B>double</FONT></B>)(x))+EPS);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(LL i=5;i&lt;=s;i+=6)
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!(x%i) || !(x%(i+2))) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> true;
+}
+<I><FONT COLOR="#B22222">// Primes less than 1000:
+</FONT></I><I><FONT COLOR="#B22222">//      2     3     5     7    11    13    17    19    23    29    31    37
+</FONT></I><I><FONT COLOR="#B22222">//     41    43    47    53    59    61    67    71    73    79    83    89
+</FONT></I><I><FONT COLOR="#B22222">//     97   101   103   107   109   113   127   131   137   139   149   151
+</FONT></I><I><FONT COLOR="#B22222">//    157   163   167   173   179   181   191   193   197   199   211   223
+</FONT></I><I><FONT COLOR="#B22222">//    227   229   233   239   241   251   257   263   269   271   277   281
+</FONT></I><I><FONT COLOR="#B22222">//    283   293   307   311   313   317   331   337   347   349   353   359
+</FONT></I><I><FONT COLOR="#B22222">//    367   373   379   383   389   397   401   409   419   421   431   433
+</FONT></I><I><FONT COLOR="#B22222">//    439   443   449   457   461   463   467   479   487   491   499   503
+</FONT></I><I><FONT COLOR="#B22222">//    509   521   523   541   547   557   563   569   571   577   587   593
+</FONT></I><I><FONT COLOR="#B22222">//    599   601   607   613   617   619   631   641   643   647   653   659
+</FONT></I><I><FONT COLOR="#B22222">//    661   673   677   683   691   701   709   719   727   733   739   743
+</FONT></I><I><FONT COLOR="#B22222">//    751   757   761   769   773   787   797   809   811   821   823   827
+</FONT></I><I><FONT COLOR="#B22222">//    829   839   853   857   859   863   877   881   883   887   907   911
+</FONT></I><I><FONT COLOR="#B22222">//    919   929   937   941   947   953   967   971   977   983   991   997
+</FONT></I>
+<I><FONT COLOR="#B22222">// Other primes:
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10 is 7.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100 is 97.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000 is 997.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000 is 9973.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000 is 99991.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000 is 999983.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000 is 9999991.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000 is 99999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000 is 999999937.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000 is 9999999967.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000 is 99999999977.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000 is 999999999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000000 is 9999999999971.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000000 is 99999999999973.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000000 is 999999999999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000000000 is 9999999999999937.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000000000 is 99999999999999997.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000000000 is 999999999999999989.
+</FONT></I></PRE>
+<HR>
+<A NAME="file31">
+<H1>IO.cpp 31/34</H1>
+<PRE>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iomanip&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+    <I><FONT COLOR="#B22222">// Ouput a specific number of digits past the decimal point,
+</FONT></I>    <I><FONT COLOR="#B22222">// in this case 5    
+</FONT></I>    cout.setf(ios::fixed); cout &lt;&lt; setprecision(5);
+    cout &lt;&lt; 100.0/7.0 &lt;&lt; endl;
+    cout.unsetf(ios::fixed);
+    
+    <I><FONT COLOR="#B22222">// Output the decimal point and trailing zeros
+</FONT></I>    cout.setf(ios::showpoint);
+    cout &lt;&lt; 100.0 &lt;&lt; endl;
+    cout.unsetf(ios::showpoint);
+    
+    <I><FONT COLOR="#B22222">// Output a '+' before positive values
+</FONT></I>    cout.setf(ios::showpos);
+    cout &lt;&lt; 100 &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; -100 &lt;&lt; endl;
+    cout.unsetf(ios::showpos);
+    
+    <I><FONT COLOR="#B22222">// Output numerical values in hexadecimal
+</FONT></I>    cout &lt;&lt; hex &lt;&lt; 100 &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; 1000 &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; 10000 &lt;&lt; dec &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file32">
+<H1>KMP.cpp 32/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">/*
+Searches for the string w in the string s (of length k). Returns the
+0-based index of the first match (k if no match is found). Algorithm
+runs in O(k) time.
+*/</FONT></I>
+
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;string&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;vector&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>typedef</FONT></B> vector&lt;<FONT COLOR="#228B22"><B>int</FONT></B>&gt; VI;
+
+<FONT COLOR="#228B22"><B>void</FONT></B> <B><FONT COLOR="#0000FF">buildTable</FONT></B>(string&amp; w, VI&amp; t)
+{
+  t = VI(w.length());  
+  <FONT COLOR="#228B22"><B>int</FONT></B> i = 2, j = 0;
+  t[0] = -1; t[1] = 0;
+  
+  <B><FONT COLOR="#A020F0">while</FONT></B>(i &lt; w.length())
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B>(w[i-1] == w[j]) { t[i] = j+1; i++; j++; }
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>(j &gt; 0) j = t[j];
+    <B><FONT COLOR="#A020F0">else</FONT></B> { t[i] = 0; i++; }
+  }
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">KMP</FONT></B>(string&amp; s, string&amp; w)
+{
+  <FONT COLOR="#228B22"><B>int</FONT></B> m = 0, i = 0;
+  VI t;
+  
+  buildTable(w, t);  
+  <B><FONT COLOR="#A020F0">while</FONT></B>(m+i &lt; s.length())
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B>(w[i] == s[m+i])
+    {
+      i++;
+      <B><FONT COLOR="#A020F0">if</FONT></B>(i == w.length()) <B><FONT COLOR="#A020F0">return</FONT></B> m;
+    }
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+    {
+      m += i-t[i];
+      <B><FONT COLOR="#A020F0">if</FONT></B>(i &gt; 0) i = t[i];
+    }
+  }  
+  <B><FONT COLOR="#A020F0">return</FONT></B> s.length();
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+  string a = (string) <FONT COLOR="#BC8F8F"><B>&quot;The example above illustrates the general technique for assembling &quot;</FONT></B>+
+    <FONT COLOR="#BC8F8F"><B>&quot;the table with a minimum of fuss. The principle is that of the overall search: &quot;</FONT></B>+
+    <FONT COLOR="#BC8F8F"><B>&quot;most of the work was already done in getting to the current position, so very &quot;</FONT></B>+
+    <FONT COLOR="#BC8F8F"><B>&quot;little needs to be done in leaving it. The only minor complication is that the &quot;</FONT></B>+
+    <FONT COLOR="#BC8F8F"><B>&quot;logic which is correct late in the string erroneously gives non-proper &quot;</FONT></B>+
+    <FONT COLOR="#BC8F8F"><B>&quot;substrings at the beginning. This necessitates some initialization code.&quot;</FONT></B>;
+  
+  string b = <FONT COLOR="#BC8F8F"><B>&quot;table&quot;</FONT></B>;
+  
+  <FONT COLOR="#228B22"><B>int</FONT></B> p = KMP(a, b);
+  cout &lt;&lt; p &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot;: &quot;</FONT></B> &lt;&lt; a.substr(p, b.length()) &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; b &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file33">
+<H1>LatLong.cpp 33/34</H1>
+<PRE>
+<I><FONT COLOR="#B22222">/*
+Converts from rectangular coordinates to latitude/longitude and vice
+versa. Uses degrees (not radians).
+*/</FONT></I>
+
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <FONT COLOR="#BC8F8F"><B>&lt;cmath&gt;</FONT></B>
+
+using namespace std;
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> ll
+{
+  <FONT COLOR="#228B22"><B>double</FONT></B> r, lat, lon;
+};
+
+<FONT COLOR="#228B22"><B>struct</FONT></B> rect
+{
+  <FONT COLOR="#228B22"><B>double</FONT></B> x, y, z;
+};
+
+ll <B><FONT COLOR="#0000FF">convert</FONT></B>(rect&amp; P)
+{
+  ll Q;
+  Q.r = sqrt(P.x*P.x+P.y*P.y+P.z*P.z);
+  Q.lat = 180/M_PI*asin(P.z/Q.r);
+  Q.lon = 180/M_PI*acos(P.x/sqrt(P.x*P.x+P.y*P.y));
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> Q;
+}
+
+rect <B><FONT COLOR="#0000FF">convert</FONT></B>(ll&amp; Q)
+{
+  rect P;
+  P.x = Q.r*cos(Q.lon*M_PI/180)*cos(Q.lat*M_PI/180);
+  P.y = Q.r*sin(Q.lon*M_PI/180)*cos(Q.lat*M_PI/180);
+  P.z = Q.r*sin(Q.lat*M_PI/180);
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> P;
+}
+
+<FONT COLOR="#228B22"><B>int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+  rect A;
+  ll B;
+  
+  A.x = -1.0; A.y = 2.0; A.z = -3.0;
+  
+  B = convert(A);
+  cout &lt;&lt; B.r &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; B.lat &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; B.lon &lt;&lt; endl;
+  
+  A = convert(B);
+  cout &lt;&lt; A.x &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; A.y &lt;&lt; <FONT COLOR="#BC8F8F"><B>&quot; &quot;</FONT></B> &lt;&lt; A.z &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file34">
+<H1>EmacsSettings.txt 34/34</H1>
+<PRE>
+;; Jack's .emacs file
+
+(global-set-key &quot;\C-z&quot;		'scroll-down)
+(global-set-key &quot;\C-x\C-p&quot;	'(lambda() (interactive) (other-window -1)) )
+(global-set-key &quot;\C-x\C-o&quot;	'other-window)
+(global-set-key &quot;\C-x\C-n&quot;	'other-window)
+(global-set-key &quot;\M-.&quot;		'end-of-buffer)
+(global-set-key &quot;\M-,&quot;		'beginning-of-buffer)
+(global-set-key &quot;\M-g&quot;		'goto-line)
+(global-set-key &quot;\C-c\C-w&quot;	'compare-windows)
+
+(tool-bar-mode 0)
+(scroll-bar-mode -1)
+
+(global-font-lock-mode 1)
+(show-paren-mode 1)
+
+(setq-default c-default-style &quot;linux&quot;)
+
+(custom-set-variables
+ '(compare-ignore-whitespace t)
+)
+</PRE>
+<HR>
+<ADDRESS>Generated by <A HREF="http://www.iki.fi/~mtr/genscript/">GNU enscript 1.6.1</A>.</ADDRESS>
+</BODY>
+</HTML>

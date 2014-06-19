@@ -1,0 +1,19 @@
+NOTE: These instructions are obsolete. To add the page numbers, use tools like Acrobat Pro and add a custom Header.
+
+1. Open notebook.html in Firefox (Windows machine).
+2. Page Setup / Margins & Header/Footer: Set left and right margins to 0.3, other margins to 0.0.  Set header/footer blank. Portrait / Shrink to fit page width.
+3. Print to PDF using CutePDF Writer, 2 pages per sheet
+4. Obtain www.tug.org/texshowcase/cheat.pdf
+5. pdftk A=notebook2up.pdf B=cheat.pdf cat AS B1-2 B4-5 output joined.pdf
+   (Note that this rotates the notebook by 180 degrees and then sticks on the 1st two pages of the cheat sheet
+6. Open page_numbers.docx on MS Word, and save as PDF: page_numbers.pdf. Do not print to a PDF printer.
+7. Print page numbers on each page: pdftk joined.pdf multistamp page_numbers.pdf
+
+
+Alternate way if you have Acrobat Pro:
+
+1. Print notebook.html with the margins specified above, only 1 page per sheet.
+2. Using Acrobat Pro, Combine notebook.pdf with cheat.pdf, and save as joined.pdf
+3. Open joined.pdf, print to another PDF file with 2 pages per sheet.
+4. Generate page_numbers.pdf.
+5. Print page numbers on each page: pdftk joined.pdf multistamp page_numbers.pdf
