@@ -1,2 +1,2 @@
-* Dinic implementation is not exactly Dinic, but it seems fast enough.
-  Ideally we want to rewrite it.
+* Dinic implementation is not exactly Dinic, but it seems fast enough. Ideally we want to rewrite it.
+ * linear_diophantine() in "Number theoretic algorithms" doesn't work correctly when a or b is 0. maybe mod_inverse() should be revised as well? it makes more sense to make linear_diophantine() a boolean function, indicating whether it succeeded finding a solution or not.
