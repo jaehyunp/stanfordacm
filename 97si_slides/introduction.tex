@@ -1,0 +1,302 @@
+\documentclass[10pt,onlymath]{beamer}
+\usefonttheme{serif}
+\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf}
+%\usepackage{graphicx,psfrag}
+
+\input defs.tex
+
+%% formatting
+
+\mode<presentation>
+{
+\usetheme{default}
+}
+\setbeamertemplate{navigation symbols}{}
+\usecolortheme[rgb={0.13,0.28,0.59}]{structure}
+\setbeamertemplate{itemize subitem}{--}
+\setbeamertemplate{frametitle} {
+    \begin{center}
+      {\large\bf \insertframetitle}
+    \end{center}
+}
+
+\newcommand\footlineon{
+  \setbeamertemplate{footline} {
+    \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,leftskip=.8cm,rightskip=.6cm]{structure}
+      \footnotesize \insertsection
+      \hfill
+      {\insertframenumber}
+    \end{beamercolorbox}
+    \vskip 0.45cm
+  }
+}
+\footlineon
+
+\AtBeginSection[] 
+{ 
+    \begin{frame}<beamer> 
+        \frametitle{Outline} 
+        \tableofcontents[currentsection,currentsubsection] 
+    \end{frame} 
+} 
+
+%% begin presentation
+
+\title{\large \bfseries Introduction}
+
+\author{Jaehyun Park\\[3ex]
+CS 97SI\\
+Stanford University}
+
+\date{\today}
+
+\begin{document}
+
+\frame{
+\thispagestyle{empty}
+\titlepage
+}
+
+\begin{frame}{Welcome to CS 97SI}
+\BIT
+\item Introduction
+\item Programming Contests
+\item How to Practice
+\item Problem Solving Examples
+\item Grading Policy
+\EIT
+\end{frame}
+
+\begin{frame}{Coaches}
+\BIT
+\item Officially: Jerry Cain
+\item Actually: Jaehyun Park
+\EIT
+\end{frame}
+
+\begin{frame}{Why Do Programming Contests?}
+\BIT
+\item You can learn:
+\BIT
+\item Many useful algorithms, mathematical insights
+\item How to code/debug quickly and accurately
+\item How to work in a team
+\EIT
+\item Then you can rock in classes, job interviews, etc.
+\item It's also fun!
+\EIT
+\end{frame}
+
+\begin{frame}{Prerequisites}
+\BIT
+\item CS 106 level programming experience
+\BIT
+\item You'll be coding in either C/C++ or Java
+\EIT
+\item Good mathematical insight
+
+\item Most importantly, eagerness to learn
+\EIT
+\end{frame}
+
+\begin{frame}{Topics}
+\begin{enumerate}
+\item Introduction
+\item Mathematics
+\item Data structures
+\item Dynamic programming (DP)
+\item Combinatorial games
+\item Graph algorithms
+\item Shortest distance problems
+\item Network flow
+\item Geometric algorithms
+\item String algorithms
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Programming Contests}
+\BIT
+\item Stanford Local Programming Contest
+\item ACM-ICPC
+\BIT
+\item Pacific Northwest Regional
+\item World Finals
+\EIT
+\item Online Contests
+\BIT
+\item TopCoder, Codeforces
+\item Google Code Jam
+\EIT
+\item And many more...
+\EIT
+\end{frame}
+
+\begin{frame} {How to Practice}
+\BIT
+\item USACO Training Program
+\item Online Judges
+\item Weekly Practice Contests
+\EIT
+\end{frame}
+
+\begin{frame} {USACO Training Program}
+\BIT
+\item \url{http://ace.delos.com/usacogate}
+\item Detailed explanation on basic algorithms, problem solving strategies
+\item Good problems
+\item Automated judge system
+\EIT
+\end{frame}
+
+\begin{frame} {Online Judges}
+\BIT
+\item Websites with automated judges
+\BIT
+\item Real contest problems
+\item Immediate feedback
+\EIT
+\item A few good OJs:
+\BIT
+\item Codeforces
+\item TopCoder
+\item Peking OJ
+\item Sphere OJ
+\item UVa OJ
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame} {Weekly Practice Contests}
+\BIT
+\item Every Saturday 11am-4pm at Gates B08
+\BIT
+\item Free food!
+\EIT
+\item Open to anyone interested
+\item Real contest problems from many sources
+\item Subscribe to the \texttt{stanford-acm-icpc} email list to get announcements
+\EIT
+\end{frame}
+
+\begin{frame} {Example}
+\begin{enumerate}
+\item Read the problem statement
+\BIT
+\item Check the input/output specification!
+\EIT
+\item Make the problem abstract
+\item Design an algorithm
+\BIT
+\item Often the hardest step
+\EIT
+\item Implement and debug
+\item Submit
+\item AC!
+\BIT
+\item If not, go back to 4
+\EIT
+\end{enumerate}
+\end{frame}
+
+\begin{frame} {Problem Solving Example}
+\BIT
+\item POJ 1000: A+B Problem
+\BIT
+\item Input: Two space-separated integers $a, b$
+\item Constraints: $0 \le a, b \le 10$
+\item Output: $a+b$
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}[fragile] {POJ 1000 Code in C/C++}
+\begin{verbatim}
+#include<stdio.h>
+int main()
+{
+    int a, b;
+    scanf("%d%d", &a, &b);
+    printf("%d\n", a + b);
+    return 0;
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame} {Another Example}
+\BIT
+\item POJ 1004: Financial Management
+\BIT
+\item Input: 12 floating point numbers on separate lines
+\item Output: Average of the given numbers
+\EIT
+
+\item Just a few more bytes than POJ 1000...
+\EIT
+\end{frame}
+
+\begin{frame}[fragile] {POJ 1004 Code in C/C++}
+\begin{verbatim}
+#include<stdio.h>
+int main()
+{
+    double sum = 0, buf;
+    for(int i = 0; i < 12; i++) {
+        scanf("%lf", &buf);
+        sum += buf;
+    }
+    printf("$%.2lf\n", sum / 12.0);
+    return 0;
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame} {Something to think about}
+\BIT
+\item What if the given numbers are HUGE?
+
+\item Not all the input constraints are explicit
+\BIT \item Hidden constraints are generally ``reasonable'' \EIT
+
+\item Always think about the worst case scenario, edge cases, etc.
+\EIT
+\end{frame}
+
+\begin{frame} {Grading Policy}
+\BIT
+\item You can either:
+\BIT
+\item Solve a given number of POJ problems on the course webpage
+\item OR, participate in 5 or more weekly practice contests
+\EIT
+
+\item If you have little experience, solving POJ problems is recommended
+\BIT
+\item Of course, doing both of them is better
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame} {Stanford ACM Team Notebook}
+\BIT
+\item \url{http://stanford.edu/~liszt90/acm/notebook.html}
+\item Implementations of many algorithms we'll learn
+\item Policy on notebook usage:
+\BIT
+\item Don't copy-paste anything from the notebook!
+\item At least type everything yourself
+\item Let me know of any error or suggestion
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}[fragile] {Links}
+\BIT
+\item Course website: \url{http://cs97si.stanford.edu}
+\item Stanford ACM Team Notebook: \url{http://stanford.edu/~liszt90/acm/notebook.html}
+\item Peking Online Judge: \url{http://poj.org}
+\item USACO Training Gate: \url{http://ace.delos.com/usacogate}
+\item Online discussion board: \url{http://piazza.com/class#winter2012/cs97si/}
+\EIT
+\end{frame}
+
+\end{document}
