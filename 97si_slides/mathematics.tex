@@ -1,0 +1,426 @@
+\documentclass[13pt,onlymath]{beamer}
+\usefonttheme{serif}
+\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf}
+%\usepackage{graphicx,psfrag}
+
+\input defs.tex
+
+%% formatting
+
+\mode<presentation>
+{
+\usetheme{default}
+}
+\setbeamertemplate{navigation symbols}{}
+\usecolortheme[rgb={0.13,0.28,0.59}]{structure}
+\setbeamertemplate{itemize subitem}{--}
+\setbeamertemplate{frametitle} {
+    \begin{center}
+      {\large\bf \insertframetitle}
+    \end{center}
+}
+
+\newcommand\footlineon{
+  \setbeamertemplate{footline} {
+    \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,leftskip=.8cm,rightskip=.6cm]{structure}
+      \footnotesize \insertsection
+      \hfill
+      {\insertframenumber}
+    \end{beamercolorbox}
+    \vskip 0.45cm
+  }
+}
+\footlineon
+
+\AtBeginSection[] 
+{ 
+    \begin{frame}<beamer> 
+        \frametitle{Outline} 
+        \tableofcontents[currentsection,currentsubsection] 
+    \end{frame} 
+} 
+
+%% begin presentation
+
+\title{\large \bfseries Mathematics}
+
+\author{Jaehyun Park\\[3ex]
+CS 97SI\\
+Stanford University}
+
+\date{\today}
+
+\begin{document}
+
+\frame{
+\thispagestyle{empty}
+\titlepage
+}
+
+\section{Algebra}
+
+\begin{frame}{Sum of Powers}
+\BEAS
+\sum_{k=1}^n k^2 &=& \frac{1}{6}n(n+1)(2n+1) \\
+\sum k^3 &=& \left(\sum k\right)^2 = \left(\frac{1}{2}n(n+1)\right)^2
+\EEAS
+\BIT
+\item Pretty useful in many random situations
+\item Memorize above!
+\EIT
+\end{frame}
+
+\begin{frame}{Fast Exponentiation}
+\BIT
+\item Recursive computation of $a^n$:
+\[
+a^n = \begin{cases}
+1 & n = 0\\
+a & n = 1\\
+(a^{n/2})^2 & n \mbox{ is even}\\
+a (a^{(n-1)/2})^2 & n \mbox{ is odd}
+\end{cases}
+\]
+\EIT
+\end{frame}
+
+\begin{frame}[fragile]{Implementation (recursive)}
+\begin{verbatim}
+double pow(double a, int n) {
+    if(n == 0) return 1;
+    if(n == 1) return a;
+    double t = pow(a, n/2);
+    return t * t * pow(a, n%2);
+}
+\end{verbatim}
+\BIT
+\item Running time: $O(\log n)$
+\EIT
+\end{frame}
+
+\begin{frame}[fragile]{Implementation (non-recursive)}
+\begin{verbatim}
+double pow(double a, int n) {
+    double ret = 1;
+    while(n) {
+        if(n%2 == 1) ret *= a;
+        a *= a; n /= 2;
+    }
+    return ret;
+}
+\end{verbatim}
+\BIT
+\item You should understand how it works
+\EIT
+\end{frame}
+
+\begin{frame}{Linear Algebra}
+\BIT
+\item Solve a system of linear equations
+\item Invert a matrix
+\item Find the rank of a matrix
+\item Compute the determinant of a matrix
+\item All of the above can be done with Gaussian elimination
+\EIT
+\end{frame}
+
+\section{Number Theory}
+
+\begin{frame}{Greatest Common Divisor (GCD)}
+\BIT
+\item $\gcd(a, b)$: greatest integer divides both $a$ and $b$
+\item Used very frequently in number theoretical problems
+
+\item Some facts:
+\BIT
+\item $\gcd(a, b) = \gcd(a, b-a)$
+\item $\gcd(a, 0) = a$
+\item $\gcd(a, b)$ is the smallest positive number in $\{ax+by \,|\, x, y \in \integers\}$
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Euclidean Algorithm}
+\BIT
+\item Repeated use of $\gcd(a, b) = \gcd(a, b-a)$
+\item Example:
+\BEAS
+\gcd(1989, 867) &=& \gcd(1989-2\times 867, 867) \\
+&=& \gcd(255, 867) \\
+&=& \gcd(255, 867-3\times 255) \\
+&=& \gcd(255, 102) \\
+&=& \gcd(255-2\times 102, 102) \\
+&=& \gcd(51, 102) \\
+&=& \gcd(51, 102-2\times 51) \\
+&=& \gcd(51, 0) \\
+&=& 51
+\EEAS
+\EIT
+\end{frame}
+
+\begin{frame}[fragile]{Implementation}
+\begin{verbatim}
+int gcd(int a, int b) {
+    while(b){int r = a % b; a = b; b = r;}
+    return a;
+}
+\end{verbatim}
+\BIT
+\item Running time: $O(\log(a+b))$
+\item Be careful: \verb,a % b, follows the sign of \verb,a,
+\BIT
+\item \verb,5 % 3 == 2,
+\item \verb,-5 % 3 == -2,
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Congruence \& Modulo Operation}
+\BIT
+\item $x \equiv y \pmod{n}$ means $x$ and $y$ have the same remainder when divided by $n$
+\item Multiplicative inverse
+\BIT
+\item $x^{-1}$ is the inverse of $x$ modulo $n$ if $x x^{-1} \equiv 1 \pmod{n}$
+\item $5^{-1} \equiv 3 \pmod{7}$ because $5 \cdot 3 \equiv 15 \equiv 1 \pmod{7}$
+\item May not exist (\eg, inverse of $2$ mod $4$)
+\item Exists if and only if $\gcd(x, n) = 1$
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Multiplicative Inverse}
+\BIT
+\item All intermediate numbers computed by Euclidean algorithm are integer combinations of $a$ and $b$
+\BIT
+\item Therefore, $\gcd(a, b) = ax+by$ for some integers $x, y$
+\item If $\gcd(a, n) = 1$, then $ax + ny = 1$ for some $x, y$
+\item Taking modulo $n$ gives $ax \equiv 1 \pmod{n}$
+\EIT
+\item We will be done if we can find such $x$ and $y$
+\EIT
+\end{frame}
+
+\begin{frame}{Extended Euclidean Algorithm}
+\BIT
+\item Main idea: keep the original algorithm, but write all intermediate numbers as integer combinations of $a$ and $b$
+\item Exercise: implementation!
+\EIT
+\end{frame}
+
+\begin{frame}{Chinese Remainder Theorem}
+\BIT
+\item Given $a,b,m,n$ with $\gcd(m, n) = 1$
+\item Find $x$ with $x\equiv a \pmod{m}$ and $x \equiv b \pmod{n}$
+
+\item Solution:
+\BIT
+\item Let $n^{-1}$ be the inverse of $n$ modulo $m$
+\item Let $m^{-1}$ be the inverse of $m$ modulo $n$
+\item Set $x = a n n^{-1} + b m m^{-1}$ (check this yourself)
+\EIT
+\item Extension: solving for more simultaneous equations
+\EIT
+\end{frame}
+
+\section{Combinatorics}
+
+\begin{frame}{Binomial Coefficients}
+\BIT
+\item $\dbinom{n}{k}$ is the number of ways to choose $k$ objects out of $n$ distinguishable objects
+\item same as the coefficient of $x^k y^{n-k}$ in the expansion of $(x+y)^n$
+\BIT
+\item Hence the name ``binomial coefficients''
+\EIT
+\item Appears everywhere in combinatorics
+\EIT
+\end{frame}
+
+\begin{frame}{Computing Binomial Coefficients}
+\BIT
+\item Solution 1: Compute using the following formula:
+\[
+\binom{n}{k} = \frac{n(n-1) \cdots (n-k+1)}{k!}
+\]
+\item Solution 2: Use Pascal's triangle
+
+\item Can use either if both $n$ and $k$ are small
+\item Use Solution 1 carefully if $n$ is big, but $k$ or $n-k$ is small
+\EIT
+\end{frame}
+
+\begin{frame}{Fibonacci Sequence}
+\BIT
+\item Definition:
+\BIT
+\item $F_0 = 0$, $F_1 = 1$
+\item $F_n = F_{n-1} + F_{n-2}$, where $n \ge 2$
+\EIT
+\item Appears in many different contexts
+\EIT
+\end{frame}
+
+\begin{frame}{Closed Form}
+\BIT
+\item $F_n = (1/\sqrt{5})(\varphi^n - \overline{\varphi}^n)$
+\BIT
+\item $\varphi = (1+\sqrt{5})/2$
+\item $\overline{\varphi} = (1-\sqrt{5})/2$
+\EIT
+\item Bad because $\varphi$ and $\sqrt{5}$ are irrational
+\item Cannot compute the exact value of $F_n$ for large $n$
+
+\item There is a more stable way to compute $F_n$
+\BIT
+\item ... and any other recurrence of a similar form
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Better ``Closed'' Form}
+\[
+\left[\begin{array}{c}F_{n+1} \\ F_n \end{array} \right] = 
+\left[\begin{array}{cc}1&1\\1&0 \end{array} \right] \left[\begin{array}{c}F_n \\ F_{n-1} \end{array} \right] =
+\left[\begin{array}{cc}1&1\\1&0 \end{array} \right]^n \left[\begin{array}{c}F_1 \\ F_0 \end{array} \right]
+\]
+\BIT
+\item Use fast exponentiation to compute the matrix power
+\item Can be extended to support any linear recurrence with constant coefficients
+\EIT
+\end{frame}
+
+\section{Geometry}
+
+\begin{frame}{Geometry}
+\BIT
+\item In theory: not that hard
+\item In programming contests: more difficult than it looks
+\item Will cover basic stuff today
+\BIT
+\item Computational geometry in week 9
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}[fragile]{When Solving Geometry Problems}
+\BIT
+\item Precision, precision, precision!
+\BIT
+\item If possible, don't use floating-point numbers
+\item If you have to, always use \verb,double, and never use \verb,float,
+\item Avoid division whenever possible
+\item Introduce small constant $\epsilon$ in (in)equality tests
+\BIT
+\item e.g., Instead of \verb,if(x == 0),, write \verb,if(abs(x) < EPS),
+\EIT
+\EIT
+\item No hacks!
+\BIT
+\item In most cases, randomization, probabilistic methods, small perturbations won't help
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{2D Vector Operations}
+\BIT
+\item Have a vector $(x, y)$
+\item Norm (distance from the origin): $\sqrt{x^2+y^2}$
+\item Counterclockwise rotation by $\theta$:
+\[
+\left[ \begin{array}{cc} \cos \theta & -\sin \theta \\ \sin \theta & \cos \theta \end{array}\right]
+\left[ \begin{array}{c} x \\ y \end{array}\right]
+\]
+\BIT
+\item Make sure to use correct units (degrees, radians)
+\EIT
+\item Normal vectors: $(y, -x)$ and $(-y, x)$
+
+\item Memorize all of them!
+\EIT
+\end{frame}
+
+\begin{frame}{Line-Line Intersection}
+\BIT
+\item Have two lines: $ax+by+c=0$ and $dx+ey+f=0$
+\item Write in matrix form:
+\[
+\left[ \begin{array}{cc} a & b \\ d & e \end{array}\right]
+\left[ \begin{array}{c} x \\ y \end{array}\right]
+=
+-\left[ \begin{array}{c} c \\ f \end{array}\right]
+\]
+\item Left-multiply by matrix inverse
+\[
+\left[ \begin{array}{cc} a & b \\ d & e \end{array}\right]^{-1} =
+\frac{1}{ae-bd}\left[ \begin{array}{cc} e & -b \\ -d & a \end{array}\right]
+\]
+\BIT
+\item Memorize this!
+\EIT
+\item Edge case: $ae=bd$
+\BIT
+\item The lines coincide or are parallel
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Circumcircle of a Triangle}
+\BIT
+\item Have three points $A, B, C$
+\item Want to compute $P$ that is equidistance from $A, B, C$
+
+\item Don't try to solve the system of quadratic equations!
+\item Instead, do the following:
+\BIT
+\item Find the (equations of the) bisectors of $AB$ and $BC$
+\item Compute their intersection
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Area of a Triangle}
+\BIT
+\item Have three points $A, B, C$
+\item Want to compute the area $S$ of triangle $ABC$
+\item Use cross product: $2S = |(B-A) \times (C-A)|$
+\item Cross product:
+\[
+(x_1, y_1) \times (x_2, y_2) = \left| \begin{array}{cc} x_1 & x_2 \\ y_1 & y_2 \end{array}\right| = x_1 y_2 - x_2 y_1
+\]
+\BIT
+\item Very important in computational geometry. Memorize!
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Area of a Simple Polygon}
+\BIT
+\item Given vertices $P_1, P_2, \ldots, P_n$ of polygon $P$
+\item Want to compute the area $S$ of $P$
+\item If $P$ is convex, we can decompose $P$ into triangles:
+\[
+2S = \left| \sum_{i=2}^{n-1}(P_{i+1} - P_1) \times (P_i - P_1) \right|
+\]
+\item It turns out that the formula above works for non-convex polygons too
+\BIT
+\item Area is the absolute value of the sum of ``signed area''
+\EIT
+\item Alternative formula (with $x_{n+1} = x_1, y_{n+1} = y_1$):
+\[
+2S = \left| \sum_{i=1}^n (x_i y_{i+1} - x_{i+1} y_i) \right|
+\]
+\EIT
+\end{frame}
+
+\begin{frame}{Conclusion}
+\BIT
+\item No need to look for one-line closed form solutions
+\item Knowing ``how to compute'' (algorithms) is good enough
+
+\item Have fun with the exercise problems
+\BIT
+\item ... and come to the practice contest if you can!
+\EIT
+\EIT
+\end{frame}
+
+\end{document}
