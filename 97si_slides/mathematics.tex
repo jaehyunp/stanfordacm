@@ -1,6 +1,6 @@
 \documentclass[13pt,onlymath]{beamer}
 \usefonttheme{serif}
-\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf}
+\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf,fancyvrb}
 %\usepackage{graphicx,psfrag}
 
 \input defs.tex
@@ -85,21 +85,21 @@ a (a^{(n-1)/2})^2 & n \mbox{ is odd}
 \end{frame}
 
 \begin{frame}[fragile]{Implementation (recursive)}
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=25pt]
 double pow(double a, int n) {
     if(n == 0) return 1;
     if(n == 1) return a;
     double t = pow(a, n/2);
     return t * t * pow(a, n%2);
 }
-\end{verbatim}
+\end{Verbatim}
 \BIT
 \item Running time: $O(\log n)$
 \EIT
 \end{frame}
 
 \begin{frame}[fragile]{Implementation (non-recursive)}
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=25pt]
 double pow(double a, int n) {
     double ret = 1;
     while(n) {
@@ -108,7 +108,7 @@ double pow(double a, int n) {
     }
     return ret;
 }
-\end{verbatim}
+\end{Verbatim}
 \BIT
 \item You should understand how it works
 \EIT
@@ -159,12 +159,12 @@ double pow(double a, int n) {
 \end{frame}
 
 \begin{frame}[fragile]{Implementation}
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=25pt]
 int gcd(int a, int b) {
     while(b){int r = a % b; a = b; b = r;}
     return a;
 }
-\end{verbatim}
+\end{Verbatim}
 \BIT
 \item Running time: $O(\log(a+b))$
 \item Be careful: \verb,a % b, follows the sign of \verb,a,

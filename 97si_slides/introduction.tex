@@ -1,6 +1,6 @@
 \documentclass[13pt,onlymath]{beamer}
 \usefonttheme{serif}
-\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf}
+\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf,fancyvrb}
 %\usepackage{graphicx,psfrag}
 
 \input defs.tex
@@ -210,7 +210,7 @@ Stanford University}
 \end{frame}
 
 \begin{frame}[fragile] {POJ 1000 Code in C/C++}
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=25pt]
 #include<stdio.h>
 int main()
 {
@@ -219,7 +219,7 @@ int main()
     printf("%d\n", a + b);
     return 0;
 }
-\end{verbatim}
+\end{Verbatim}
 \end{frame}
 
 \begin{frame} {Another Example}
@@ -235,7 +235,7 @@ int main()
 \end{frame}
 
 \begin{frame}[fragile] {POJ 1004 Code in C/C++}
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=25pt]
 #include<stdio.h>
 int main()
 {
@@ -247,7 +247,7 @@ int main()
     printf("$%.2lf\n", sum / 12.0);
     return 0;
 }
-\end{verbatim}
+\end{Verbatim}
 \end{frame}
 
 \begin{frame} {Something to think about}
