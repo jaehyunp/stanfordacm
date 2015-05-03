@@ -69,7 +69,7 @@ struct LPSolver {
       if (D[x][s] >= -EPS) return true;
       int r = -1;
       for (int i = 0; i < m; i++) {
-	if (D[i][s] <= 0) continue;
+	if (D[i][s] <= EPS) continue;
 	if (r == -1 || D[i][n+1] / D[i][s] < D[r][n+1] / D[r][s] ||
 	    D[i][n+1] / D[i][s] == D[r][n+1] / D[r][s] && B[i] < B[r]) r = i;
       }
