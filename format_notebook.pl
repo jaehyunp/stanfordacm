@@ -41,6 +41,7 @@ my @filenames = (
     ['Binary Indexed Tree', 'BIT.cc', 'Data structures'],
     ['Union-Find Set (C/C++)', 'UnionFind.cc', 'Data structures'],
     ['KD-tree (C++)', 'KDTree.cc', 'Data structures'],
+    ['Splay Tree (C++)', 'splay.cpp', 'Data structures'],
     ['Lazy Segment Tree (Java)', 'SegmentTreeLazy.java', 'Data structures'],
     ['Lowest Common Ancestor (C++)', 'LCA.cc', 'Data structures'],
 
@@ -70,7 +71,7 @@ sub InsertTOC {
 	chomp $line;
 	print FILE $line."\n";
 	if ($line eq "<A NAME=\"top\">"){
-            print FILE "<CENTER><H1><U>Stanford University ACM Team Notebook (2013-14)</U></H1></CENTER>\n";
+            print FILE "<CENTER><H1><U>Stanford University ACM Team Notebook (2014-15)</U></H1></CENTER>\n";
 	    print FILE "<H1>Table of Contents</H1>\n";
 	    for (my $i = 0; $i < @filenames; $i++){
 		if ($i == 0 || $filenames[$i][2] ne $filenames[$i-1][2]){
