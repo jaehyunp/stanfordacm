@@ -119,7 +119,7 @@ sub Main {
     }    
     
     # initial processing
-    my $command = "cd filtered; enscript -G2r -E --color -o $tmpfile --language=html -t \"Stanford University ACM Team Notebook (2013-14)\"";
+    my $command = "cd filtered; enscript -G2r -E --color -o $tmpfile --language=html -t \"Stanford University ACM Team Notebook (2014-15)\"";
     for (my $i = 0; $i < @filenames; $i++){ $command .= " ".$filenames[$i][1]; }
     `$command`;
 
