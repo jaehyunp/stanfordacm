@@ -1,13 +1,16 @@
-// --------------------------------------------------------------------------
-// A straightforward, but probably sub-optimal KD-tree implmentation that's
-// probably good enough for most things (current it's a 2D-tree)
+// -----------------------------------------------------------------
+// A straightforward, but probably sub-optimal KD-tree implmentation
+// that's probably good enough for most things (current it's a
+// 2D-tree)
 //
 //  - constructs from n points in O(n lg^2 n) time
-//  - handles nearest-neighbor query in O(lg n) if points are well distributed
-//  - worst case for nearest-neighbor may be linear in pathological case
+//  - handles nearest-neighbor query in O(lg n) if points are well
+//    distributed
+//  - worst case for nearest-neighbor may be linear in pathological
+//    case
 //
 // Sonny Chan, Stanford University, April 2009
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------
 
 #include <iostream>
 #include <vector>

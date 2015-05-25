@@ -1,13 +1,13 @@
 ;; Jack's .emacs file
 
-(global-set-key "\C-z"		'scroll-down)
-(global-set-key "\C-x\C-p"	'(lambda() (interactive) (other-window -1)) )
-(global-set-key "\C-x\C-o"	'other-window)
-(global-set-key "\C-x\C-n"	'other-window)
-(global-set-key "\M-."		'end-of-buffer)
-(global-set-key "\M-,"		'beginning-of-buffer)
-(global-set-key "\M-g"		'goto-line)
-(global-set-key "\C-c\C-w"	'compare-windows)
+(global-set-key "\C-z"	    'scroll-down)
+(global-set-key "\C-x\C-p"  '(lambda() (interactive) (other-window -1)) )
+(global-set-key "\C-x\C-o"  'other-window)
+(global-set-key "\C-x\C-n"  'other-window)
+(global-set-key "\M-."      'end-of-buffer)
+(global-set-key "\M-,"      'beginning-of-buffer)
+(global-set-key "\M-g"      'goto-line)
+(global-set-key "\C-c\C-w"  'compare-windows)
 
 (tool-bar-mode 0)
 (scroll-bar-mode -1)

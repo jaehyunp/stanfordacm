@@ -8,3 +8,5 @@
 *.synctex.gz
 *.toc
 *.vrb
+*.dvi
+*.ps
