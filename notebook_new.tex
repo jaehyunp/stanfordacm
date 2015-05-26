@@ -1,18 +1,26 @@
 \documentclass[twocolumn]{article}
-\usepackage[landscape,margin=0.3in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 \usepackage{url,hyperref}
+\usepackage{fancyhdr}
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{tocloft}
+\usepackage{pdflscape}
+
+\renewcommand*{\ttdefault}{pcr}
+\renewcommand\cftsecfont{\small\bfseries}
+\renewcommand\cftsecpagefont{\small}
+\renewcommand\cftsubsecfont{\footnotesize}
+\renewcommand\cftsubsecpagefont{\footnotesize}
 
 \lstdefinestyle{customcc}{
    language=C++,
    belowcaptionskip=1\baselineskip,
    breaklines=true,
-   frame=L,
    xleftmargin=\parindent,
    showstringspaces=false,
-   basicstyle=\footnotesize\ttfamily,
+   basicstyle=\scriptsize\ttfamily,
    keywordstyle=\bfseries\color{green!40!black},
    commentstyle=\itshape\color{red!80!black},
    identifierstyle=\color{blue},
@@ -22,115 +30,116 @@
    language=Java,
    belowcaptionskip=1\baselineskip,
    breaklines=true,
-   frame=L,
    xleftmargin=\parindent,
    showstringspaces=false,
-   basicstyle=\footnotesize\ttfamily,
+   basicstyle=\scriptsize\ttfamily,
    keywordstyle=\bfseries\color{green!40!black},
    commentstyle=\itshape\color{purple!40!black},
    identifierstyle=\color{blue},
    stringstyle=\color{orange},
 }
 \lstdefinestyle{customtxt}{
-   %language=Java,
    belowcaptionskip=1\baselineskip,
    breaklines=true,
-   frame=L,
    xleftmargin=\parindent,
    showstringspaces=false,
-   basicstyle=\footnotesize\ttfamily,
-   %keywordstyle=\footnotesize\ttfamily,
-   %commentstyle=\footnotesize\ttfamily,
-   %identifierstyle=\color{blue},
-   %stringstyle=\color{orange},
+   basicstyle=\scriptsize\ttfamily,
 }
 \lstset{escapechar=@}
 
+\pagestyle{fancy}
+\lhead{Stanford University}
+\chead{}
+\rhead{\thepage}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
 \begin{document}
-%\begin{abstract}
-%Abstract comes here.
-%\end{abstract}
+\begin{landscape}
 \tableofcontents
 
 \section{Combinatorial optimization}
 \subsection{Sparse max-flow}
-\lstinputlisting[style=customcc]{code/Dinic.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Dinic.cc}
 \subsection{Min-cost max-flow}
-\lstinputlisting[style=customcc]{code/MinCostMaxFlow.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/MinCostMaxFlow.cc}
 \subsection{Push-relabel max-flow}
-\lstinputlisting[style=customcc]{code/PushRelabel.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/PushRelabel.cc}
 \subsection{Min-cost matching}
-\lstinputlisting[style=customcc]{code/MinCostMatching.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/MinCostMatching.cc}
 \subsection{Max bipartite matching}
-\lstinputlisting[style=customcc]{code/MaxBipartiteMatching.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/MaxBipartiteMatching.cc}
 \subsection{Global min-cut}
-\lstinputlisting[style=customcc]{code/MinCut.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/MinCut.cc}
 \subsection{Graph cut inference}
-\lstinputlisting[style=customcc]{code/GraphCutInference.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/GraphCutInference.cc}
 
 \section{Geometry}
 \subsection{Convex hull}
-\lstinputlisting[style=customcc]{code/ConvexHull.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/ConvexHull.cc}
 \subsection{Miscellaneous geometry}
-\lstinputlisting[style=customcc]{code/Geometry.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Geometry.cc}
 \subsection{Java geometry}
-\lstinputlisting[style=customjava]{code/JavaGeometry.java}
+\raggedbottom\lstinputlisting[style=customjava]{code/JavaGeometry.java}
 \subsection{3D geometry}
-\lstinputlisting[style=customjava]{code/Geom3D.java}
+\raggedbottom\lstinputlisting[style=customjava]{code/Geom3D.java}
 \subsection{Slow Delaunay triangulation}
-\lstinputlisting[style=customjava]{code/Delaunay.cc}
+\raggedbottom\lstinputlisting[style=customjava]{code/Delaunay.cc}
 
 \section{Numerical algorithms}
 \subsection{Number theory (modular, Chinese remainder, linear Diophantine)}
-\lstinputlisting[style=customcc]{code/Euclid.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Euclid.cc}
 \subsection{Systems of linear equations, matrix inverse, determinant}
-\lstinputlisting[style=customcc]{code/GaussJordan.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/GaussJordan.cc}
 \subsection{Reduced row echelon form, matrix rank}
-\lstinputlisting[style=customcc]{code/ReducedRowEchelonForm.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/ReducedRowEchelonForm.cc}
 \subsection{Fast Fourier transform}
-\lstinputlisting[style=customcc]{code/FFT_new.cpp}
+\raggedbottom\lstinputlisting[style=customcc]{code/FFT_new.cpp}
 \subsection{Simplex algorithm}
-\lstinputlisting[style=customcc]{code/Simplex.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Simplex.cc}
 
 \section{Graph algorithms}
 \subsection{Fast Dijkstra\'s algorithm}
-\lstinputlisting[style=customcc]{code/FastDijkstra.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/FastDijkstra.cc}
 \subsection{Strongly connected components}
-\lstinputlisting[style=customcc]{code/SCC.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/SCC.cc}
 \subsection{Eulerian path}
-\lstinputlisting[style=customcc]{code/EulerianPath.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/EulerianPath.cc}
 
 \section{Data structures}
 \subsection{Suffix array}
-\lstinputlisting[style=customcc]{code/SuffixArray.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/SuffixArray.cc}
 \subsection{Binary Indexed Tree}
-\lstinputlisting[style=customcc]{code/BIT.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/BIT.cc}
 \subsection{Union-find set}
-\lstinputlisting[style=customcc]{code/UnionFind.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/UnionFind.cc}
 \subsection{KD-tree}
-\lstinputlisting[style=customcc]{code/KDTree.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/KDTree.cc}
 \subsection{Splay tree}
-\lstinputlisting[style=customcc]{code/splay.cpp}
+\raggedbottom\lstinputlisting[style=customcc]{code/splay.cpp}
 \subsection{Lazy segment tree}
-\lstinputlisting[style=customjava]{code/SegmentTreeLazy.java}
+\raggedbottom\lstinputlisting[style=customjava]{code/SegmentTreeLazy.java}
 \subsection{Lowest common ancestor}
-\lstinputlisting[style=customcc]{code/LCA.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/LCA.cc}
 
 \section{Miscellaneous}
 \subsection{Longest increasing subsequence}
-\lstinputlisting[style=customcc]{code/LongestIncreasingSubsequence.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/LongestIncreasingSubsequence.cc}
 \subsection{Dates}
-\lstinputlisting[style=customcc]{code/Dates.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Dates.cc}
 \subsection{Regular expressions}
-\lstinputlisting[style=customjava]{code/LogLan.java}
+\raggedbottom\lstinputlisting[style=customjava]{code/LogLan.java}
 \subsection{Prime numbers}
-\lstinputlisting[style=customcc]{code/Primes.cc}
+\raggedbottom\lstinputlisting[style=customcc]{code/Primes.cc}
 \subsection{C++ input/output}
-\lstinputlisting[style=customcc]{code/IO.cpp}
+\raggedbottom\lstinputlisting[style=customcc]{code/IO.cpp}
 \subsection{Knuth-Morris-Pratt}
-\lstinputlisting[style=customcc]{code/KMP.cpp}
+\raggedbottom\lstinputlisting[style=customcc]{code/KMP.cpp}
 \subsection{Latitude/longitude}
-\lstinputlisting[style=customcc]{code/LatLong.cpp}
+\raggedbottom\lstinputlisting[style=customcc]{code/LatLong.cpp}
 \subsection{Emacs settings}
-\lstinputlisting[style=customtxt]{code/EmacsSettings.txt}
+\raggedbottom\lstinputlisting[style=customtxt]{code/EmacsSettings.txt}
+
+\end{landscape}
 \end{document}
