@@ -5,7 +5,7 @@
 struct cpx
 {
   cpx(){}
-  cpx(double aa):a(aa){}
+  cpx(double aa):a(aa),b(0){}
   cpx(double aa, double bb):a(aa),b(bb){}
   double a;
   double b;
