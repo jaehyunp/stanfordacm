@@ -1,0 +1,261 @@
+\documentclass[13pt,onlymath]{beamer}
+\usefonttheme{serif}
+\usepackage{graphicx,amsmath,amssymb,tikz,psfrag,epstopdf,fancyvrb}
+\usepackage[lighttt]{lmodern}
+%\usepackage{graphicx,psfrag}
+
+\input defs.tex
+
+%% formatting
+
+\mode<presentation>
+{
+\usetheme{default}
+}
+\setbeamertemplate{navigation symbols}{}
+\usecolortheme[rgb={0.13,0.28,0.59}]{structure}
+\setbeamertemplate{itemize subitem}{--}
+\setbeamertemplate{frametitle} {
+    \begin{center}
+      {\large\bf \insertframetitle}
+    \end{center}
+}
+
+\newcommand\footlineon{
+  \setbeamertemplate{footline} {
+    \begin{beamercolorbox}[ht=2.5ex,dp=1.125ex,leftskip=.8cm,rightskip=.6cm]{structure}
+      \footnotesize \insertsection
+      \hfill
+      {\insertframenumber}
+    \end{beamercolorbox}
+    \vskip 0.45cm
+  }
+}
+\footlineon
+
+\AtBeginSection[] 
+{ 
+    \begin{frame}<beamer> 
+        \frametitle{Outline} 
+        \tableofcontents[currentsection,currentsubsection] 
+    \end{frame} 
+} 
+
+%% begin presentation
+
+\title{\large \bfseries Shortest Path Algorithms}
+
+\author{Jaehyun Park\\[3ex]
+CS 97SI\\
+Stanford University}
+
+\date{\today}
+
+\begin{document}
+
+\frame{
+\thispagestyle{empty}
+\titlepage
+}
+
+\begin{frame}{Shortest Path Problem}
+\BIT
+\item Input: a weighted graph $G = (V, E)$
+\BIT
+\item The edges can be directed or not
+\item Sometimes, we allow negative edge weights
+\item Note: use BFS for unweighted graphs
+\EIT
+\item Output: the path between two given nodes $u$ and $v$ that minimizes the total weight (or cost, length)
+\BIT
+\item Sometimes, we want to compute all-pair shortest paths
+\item Sometimes, we want to compute shortest paths from $u$ to all other nodes
+\EIT \EIT
+\end{frame}
+
+\section{Floyd-Warshall Algorithm}
+
+\begin{frame}{Floyd-Warshall Algorithm}
+\BIT
+\item Given a directed weighted graph $G$
+\item Outputs a matrix $D$ where $d_{ij}$ is the shortest distance from node $i$ to $j$
+\item Can detect a negative-weight cycle
+\item Runs in $\Theta(n^3)$ time
+\item Extremely easy to code
+\BIT
+\item Coding time less than a few minutes
+\EIT
+\EIT
+\end{frame}
+
+\begin{frame}{Floyd-Warshall Pseudocode}
+\BIT
+\item Initialize $D$ as the given cost matrix
+\item For $k=1, \ldots, n$:
+\BIT
+\item For all $i$ and $j$:
+\BIT
+\item $d_{ij} := \min(d_{ij}, d_{ik}+d_{kj})$
+\EIT \EIT
+\item If $d_{ij} + d_{ji} < 0$ for some $i$ and $j$, then the graph has a negative weight cycle
+\vfill
+\item Done!
+\BIT
+\item But how does this work?
+\EIT \EIT
+\end{frame}
+
+\begin{frame}{How Does Floyd-Warshall Work?}
+\BIT
+\item Define $f(i, j, k)$ as the shortest distance from $i$ to $j$, using nodes $1, \ldots, k$ as intermediate nodes
+\BIT
+\item $f(i, j, n)$ is the shortest distance from $i$ to $j$
+\item $f(i, j, 0) = \mathrm{cost}(i, j)$
+\EIT
+\item The optimal path for $f(i,j,k)$ may or may not have $k$ as an intermediate node
+\BIT
+\item If it does, $f(i,j,k) = f(i,k,k-1) + f(k,j,k-1)$
+\item Otherwise, $f(i,j,k) = f(i,j,k-1)$
+\EIT
+\item Therefore, $f(i,j,k)$ is the minimum of the two quantities above
+\EIT
+\end{frame}
+
+\begin{frame}{How Does Floyd-Warshall Work?}
+\BIT
+\item We have the following recurrences and base cases
+\BIT
+\item $f(i,j,0) = \mathrm{cost}(i,j)$
+\item $f(i,j,k) = \min(f(i,k,k-1)+f(k,j,k-1), f(i,j,k-1))$
+\EIT
+\item From the values of $f(\cdot, \cdot, k-1)$, we can calculate $f(\cdot, \cdot, k)$
+\BIT
+\item It turns out that we don't need a separate matrix for each $k$; overwriting the existing values is fine
+\EIT
+\item That's how we get Floyd-Warshall algorithm
+\EIT
+\end{frame}
+
+\section{Dijkstra's Algorithm}
+
+\begin{frame}{Dijkstra's Algorithm}
+\BIT
+\item Given a directed weighted graph $G$ and a source $s$
+\BIT
+\item Important: The edge weights have to be nonnegative!
+\EIT
+\item Outputs a vector $d$ where $d_i$ is the shortest distance from $s$ to node $i$
+\item Time complexity depends on the implementation:
+\BIT
+\item Can be $O(n^2 + m)$, $O(m \log n)$, or $O(m + n \log n)$
+\EIT
+\item Very similar to Prim's algorithm
+\item Intuition: Find the closest node to $s$, and then the second closest one, then the third, etc.
+\EIT
+\end{frame}
+
+\begin{frame}{Dijkstra's Algorithm}
+\BIT
+\item Maintain a set of nodes $S$, the shortest distances to which are decided
+\item Also maintain a vector $d$, the shortest distance estimate from $s$
+\item Initially, $S:= \{s\}$, and $d_v := \mathrm{cost}(s, v)$
+\item Repeat until $S = V$:
+\BIT
+\item Find $v \notin S$ with the smallest $d_v$, and add it to $S$
+\item For each edge $v \rightarrow u$ of cost $c$:
+\BIT
+\item $d_u := \min(d_u, d_v+c)$
+\EIT \EIT \EIT
+\end{frame}
+
+\section{Bellman-Ford Algorithm}
+
+\begin{frame}{Bellman-Ford Algorithm}
+\BIT
+\item Given a directed weighted graph $G$ and a source $s$
+\item Outputs a vector $d$ where $d_i$ is the shortest distance from $s$ to node $i$
+\item Can detect a negative-weight cycle
+\item Runs in $\Theta(nm)$ time
+\item Extremely easy to code
+\BIT
+\item Coding time less than a few minutes
+\EIT \EIT
+\end{frame}
+
+\begin{frame}{Bellman-Ford Pseudocode}
+\BIT
+\item Initialize $d_s:=0$ and $d_v:=\infty$ for all $v \ne s$
+\item For $k=1, \ldots, n-1$:
+\BIT
+\item For each edge $u \rightarrow v$ of cost $c$:
+\BIT
+\item $d_v := \min(d_v, d_u+c)$
+\EIT \EIT
+\item For each edge $u \rightarrow v$ of cost $c$:
+\BIT
+\item If $d_v > d_u + c$:
+\BIT
+\item Then the graph contains a negative-weight cycle
+\EIT \EIT \EIT
+\end{frame}
+
+\begin{frame}{Why Does Bellman-Ford Work?}
+\BIT
+\item A shortest path can have at most $n-1$ edges
+\item At the $k$th iteration, all shortest paths using $k$ or less edges are computed
+\item After $n-1$ iterations, all distances must be final; for every edge $u\rightarrow v$ of cost $c$, $d_v \le d_u+c$ holds
+\BIT
+\item Unless there is a negative-weight cycle
+\item This is how the negative-weight cycle detection works
+\EIT \EIT
+\end{frame}
+
+\begin{frame}{System of Difference Constraints}
+\BIT
+\item Given $m$ inequalities of the form $x_i - x_j \le c$
+\item Want to find real numbers $x_1, \ldots, x_n$ that satisfy all the given inequalities
+\vfill
+\item Seemingly this has nothing to do with shortest paths
+\BIT
+\item But it can be solved using Bellman-Ford
+\EIT \EIT
+\end{frame}
+
+\begin{frame}{Graph Construction}
+\BIT
+\item Create node $i$ for every variable $x_i$
+\item Make an imaginary source node $s$
+\item Create zero-cost edges from $s$ to all other nodes
+\item Rewrite the given inequalities as $x_i \le x_j + c$
+\BIT
+\item For each of these constraint, make an edge from $j$ to $i$ with cost $c$
+\EIT
+\vfill
+\item Now we run Bellman-Ford using $s$ as the source
+\EIT
+\end{frame}
+
+\begin{frame}{What Happens?}
+\BIT
+\item For every edge $j\rightarrow i$ with cost $c$, the shortest distance $d$vector will satisfy $d_i \le d_j + c$
+\BIT
+\item Setting $x_i = d_i$ gives a solution!
+\EIT
+\item What if there is a negative-weight cycle?
+\BIT
+\item Assume that $1 \rightarrow 2 \rightarrow \cdots \rightarrow 1$ is a negative-weight cycle
+\item From our construction, the given constraints contain $x_2 \le x_1 + c_1$, $x_3 \le x_2 + c_2$, etc.
+\item Adding all of them gives $0 \le (\mbox{something negative})$
+\item \ie, the given constraints were impossible to satisfy
+\EIT \EIT
+\end{frame}
+
+\begin{frame}{System of Difference Constraints}
+\BIT
+\item It turns out that our solution minimizes the span of the variables: $\max x_i - \min x_i$
+\item We won't prove it
+\item This is a big hint on POJ 3169!
+\EIT
+\end{frame}
+
+\end{document}
