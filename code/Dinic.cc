@@ -4,84 +4,99 @@
 // Running time:
 //     O(|V|^2 |E|)
 //
-// INPUT: 
+// INPUT:
 //     - graph, constructed using AddEdge()
-//     - source
-//     - sink
+//     - source and sink
 //
 // OUTPUT:
 //     - maximum flow value
-//     - To obtain the actual flow values, look at all edges with
-//       capacity > 0 (zero capacity edges are residual edges).
+//     - To obtain actual flow values, look at edges with capacity > 0
+//       (zero capacity edges are residual edges).
 
-#include <cmath>
-#include <vector>
 #include <iostream>
-#include <queue>
+#include <vector>
 
 using namespace std;
-
-const int INF = 2000000000;
+typedef long long LL;
 
 struct Edge {
   int from, to, cap, flow, index;
   Edge(int from, int to, int cap, int flow, int index) :
     from(from), to(to), cap(cap), flow(flow), index(index) {}
+  LL rcap() { return cap - flow; }
 };
 
 struct Dinic {
   int N;
   vector<vector<Edge> > G;
-  vector<Edge *> dad;
+  vector<vector<Edge *> > Lf;
+  vector<int> layer;
   vector<int> Q;
   
-  Dinic(int N) : N(N), G(N), dad(N), Q(N) {}
+  Dinic(int N) : N(N), G(N), Q(N) {}
   
   void AddEdge(int from, int to, int cap) {
+    if (from == to) return;
     G[from].push_back(Edge(from, to, cap, 0, G[to].size()));
-    if (from == to) G[from].back().index++;
     G[to].push_back(Edge(to, from, 0, 0, G[from].size() - 1));
   }
 
-  long long BlockingFlow(int s, int t) {
-    fill(dad.begin(), dad.end(), (Edge *) NULL);
-    dad[s] = &G[0][0] - 1;
+  LL BlockingFlow(int s, int t) {
+    layer.clear(); layer.resize(N, -1);
+    layer[s] = 0;
+    Lf.clear(); Lf.resize(N);
     
     int head = 0, tail = 0;
     Q[tail++] = s;
     while (head < tail) {
       int x = Q[head++];
       for (int i = 0; i < G[x].size(); i++) {
-	Edge &e = G[x][i];
-	if (!dad[e.to] && e.cap - e.flow > 0) {
-	  dad[e.to] = &G[x][i];
-	  Q[tail++] = e.to;
-	}
+        Edge &e = G[x][i]; if (e.rcap() <= 0) continue;
+        if (layer[e.to] == -1) {
+          layer[e.to] = layer[e.from] + 1;
+          Q[tail++] = e.to;
+        }
+        if (layer[e.to] > layer[e.from]) {
+          Lf[e.from].push_back(&e);
+        }
       }
     }
-    if (!dad[t]) return 0;
+    if (layer[t] == -1) return 0;
 
-    long long totflow = 0;
-    for (int i = 0; i < G[t].size(); i++) {
-      Edge *start = &G[G[t][i].to][G[t][i].index];
-      int amt = INF;
-      for (Edge *e = start; amt && e != dad[s]; e = dad[e->from]) {
-	if (!e) { amt = 0; break; }
-	amt = min(amt, e->cap - e->flow);
+    LL totflow = 0;
+    vector<Edge *> P;
+    while (!Lf[s].empty()) {
+      int curr = P.empty() ? s : P.back()->to;
+      if (curr == t) { // Augment
+        LL amt = P.front()->rcap();
+        for (int i = 0; i < P.size(); ++i) {
+          amt = min(amt, P[i]->rcap());
+        }
+        totflow += amt;
+        for (int i = P.size() - 1; i >= 0; --i) {
+          P[i]->flow += amt;
+          G[P[i]->to][P[i]->index].flow -= amt;
+          if (P[i]->rcap() <= 0) {
+            Lf[P[i]->from].pop_back();
+            P.resize(i);
+          }
+        }
+      } else if (Lf[curr].empty()) { // Retreat
+        P.pop_back();
+        for (int i = 0; i < N; ++i)
+          for (int j = 0; j < Lf[i].size(); ++j)
+            if (Lf[i][j]->to == curr)
+              Lf[i].erase(Lf[i].begin() + j);
+      } else { // Advance
+        P.push_back(Lf[curr].back());
       }
-      if (amt == 0) continue;
-      for (Edge *e = start; amt && e != dad[s]; e = dad[e->from]) {
-	e->flow += amt;
-	G[e->to][e->index].flow -= amt;
-      }
-      totflow += amt;
     }
     return totflow;
   }
 
-  long long GetMaxFlow(int s, int t) {
-    long long totflow = 0;
-    while (long long flow = BlockingFlow(s, t))
+  LL GetMaxFlow(int s, int t) {
+    LL totflow = 0;
+    while (LL flow = BlockingFlow(s, t))
       totflow += flow;
     return totflow;
   }
