@@ -1741,55 +1741,55 @@ using namespace std;
 <B><FONT COLOR="#228B22">typedef</FONT></B> vector&lt;VT&gt; VVT;
 
 <B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">rref</FONT></B>(VVT &amp;a) {
-	<B><FONT COLOR="#228B22">int</FONT></B> n = a.size();
-	<B><FONT COLOR="#228B22">int</FONT></B> m = a[0].size();
-	<B><FONT COLOR="#228B22">int</FONT></B> r = 0;
-	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> c = 0; c &lt; m &amp;&amp; r &lt; n; c++) {
-		<B><FONT COLOR="#228B22">int</FONT></B> j = r;
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = r + 1; i &lt; n; i++)
-			<B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[i][c]) &gt; fabs(a[j][c])) j = i;
-		<B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[j][c]) &lt; EPSILON) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-		swap(a[j], a[r]);
+  <B><FONT COLOR="#228B22">int</FONT></B> n = a.size();
+  <B><FONT COLOR="#228B22">int</FONT></B> m = a[0].size();
+  <B><FONT COLOR="#228B22">int</FONT></B> r = 0;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> c = 0; c &lt; m &amp;&amp; r &lt; n; c++) {
+    <B><FONT COLOR="#228B22">int</FONT></B> j = r;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = r + 1; i &lt; n; i++)
+      <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[i][c]) &gt; fabs(a[j][c])) j = i;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(a[j][c]) &lt; EPSILON) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+    swap(a[j], a[r]);
 
-		T s = 1.0 / a[r][c];
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; m; j++) a[r][j] *= s;
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) {
-			T t = a[i][c];
-			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; m; j++) a[i][j] -= t * a[r][j];
-		}
-		r++;
-	}
-	<B><FONT COLOR="#A020F0">return</FONT></B> r;
+    T s = 1.0 / a[r][c];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; m; j++) a[r][j] *= s;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) {
+      T t = a[i][c];
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; m; j++) a[i][j] -= t * a[r][j];
+    }
+    r++;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> r;
 }
 
 <B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
-	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n = 5, m = 4;
-	<B><FONT COLOR="#228B22">double</FONT></B> A[n][m] = {
-		{16,  2,  3, 13},
-		{ 5, 11, 10,  8},
-		{ 9,  7,  6, 12},
-		{ 4, 14, 15,  1},
-		{13, 21, 21, 13}};
-	VVT a(n);
-	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++)
-		a[i] = VT(A[i], A[i] + m);
+  <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n = 5, m = 4;
+  <B><FONT COLOR="#228B22">double</FONT></B> A[n][m] = {
+    {16,  2,  3, 13},
+    { 5, 11, 10,  8},
+    { 9,  7,  6, 12},
+    { 4, 14, 15,  1},
+    {13, 21, 21, 13}};
+  VVT a(n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++)
+    a[i] = VT(A[i], A[i] + m);
 
-	<B><FONT COLOR="#228B22">int</FONT></B> rank = rref(a);
+  <B><FONT COLOR="#228B22">int</FONT></B> rank = rref(a);
 
-	<I><FONT COLOR="#B22222">// expected: 3
-</FONT></I>	cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Rank: &quot;</FONT></B> &lt;&lt; rank &lt;&lt; endl;
+  <I><FONT COLOR="#B22222">// expected: 3
+</FONT></I>  cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Rank: &quot;</FONT></B> &lt;&lt; rank &lt;&lt; endl;
 
-	<I><FONT COLOR="#B22222">// expected: 1 0 0 1 
-</FONT></I>	<I><FONT COLOR="#B22222">//           0 1 0 3 
-</FONT></I>	<I><FONT COLOR="#B22222">//           0 0 1 -3 
-</FONT></I>	<I><FONT COLOR="#B22222">//           0 0 0 3.10862e-15
-</FONT></I>	<I><FONT COLOR="#B22222">//           0 0 0 2.22045e-15
-</FONT></I>	cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;rref: &quot;</FONT></B> &lt;&lt; endl;
-	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; 5; i++) {
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; 4; j++)
-			cout &lt;&lt; a[i][j] &lt;&lt; <B><FONT COLOR="#BC8F8F">' '</FONT></B>;
-		cout &lt;&lt; endl;
-	}
+  <I><FONT COLOR="#B22222">// expected: 1 0 0 1 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 1 0 3 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 1 -3 
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 0 3.10862e-15
+</FONT></I>  <I><FONT COLOR="#B22222">//           0 0 0 2.22045e-15
+</FONT></I>  cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;rref: &quot;</FONT></B> &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; 5; i++) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; 4; j++)
+      cout &lt;&lt; a[i][j] &lt;&lt; <B><FONT COLOR="#BC8F8F">' '</FONT></B>;
+    cout &lt;&lt; endl;
+  }
 }
 </PRE>
 <HR>
@@ -1971,95 +1971,95 @@ using namespace std;
 DOUBLE <B><FONT COLOR="#0000FF">Dabs</FONT></B>(DOUBLE x) { <B><FONT COLOR="#A020F0">return</FONT></B> x &lt; 0 ? -x : x; }
 
 <B><FONT COLOR="#228B22">struct</FONT></B> LPSolver {
-	<B><FONT COLOR="#228B22">int</FONT></B> m, n;
-	VI B, N;
-	VVD D;
+  <B><FONT COLOR="#228B22">int</FONT></B> m, n;
+  VI B, N;
+  VVD D;
 
-	LPSolver(<B><FONT COLOR="#228B22">const</FONT></B> VVD &amp;A, <B><FONT COLOR="#228B22">const</FONT></B> VD &amp;b, <B><FONT COLOR="#228B22">const</FONT></B> VD &amp;c) :
-		m(b.size()), n(c.size()), N(n + 1), B(m), D(m + 2, VD(n + 2)) {
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n; j++) D[i][j] = A[i][j];
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) { B[i] = n + i; D[i][n] = -1; D[i][n + 1] = b[i]; }
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n; j++) { N[j] = j; D[m][j] = -c[j]; }
-		N[n] = -1; D[m + 1][n] = 1;
-	}
+  LPSolver(<B><FONT COLOR="#228B22">const</FONT></B> VVD &amp;A, <B><FONT COLOR="#228B22">const</FONT></B> VD &amp;b, <B><FONT COLOR="#228B22">const</FONT></B> VD &amp;c) :
+    m(b.size()), n(c.size()), N(n + 1), B(m), D(m + 2, VD(n + 2)) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n; j++) D[i][j] = A[i][j];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) { B[i] = n + i; D[i][n] = -1; D[i][n + 1] = b[i]; }
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n; j++) { N[j] = j; D[m][j] = -c[j]; }
+    N[n] = -1; D[m + 1][n] = 1;
+  }
 
-	<B><FONT COLOR="#228B22">void</FONT></B> Pivot(<B><FONT COLOR="#228B22">int</FONT></B> r, <B><FONT COLOR="#228B22">int</FONT></B> s) {
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m + 2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r)
-			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n + 2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s)
-				D[i][j] -= D[r][j] * D[i][s] / D[r][s];
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n + 2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s) D[r][j] /= D[r][s];
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m + 2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) D[i][s] /= -D[r][s];
-		D[r][s] = 1.0 / D[r][s];
-		swap(B[r], N[s]);
-	}
+  <B><FONT COLOR="#228B22">void</FONT></B> Pivot(<B><FONT COLOR="#228B22">int</FONT></B> r, <B><FONT COLOR="#228B22">int</FONT></B> s) {
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m + 2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r)
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n + 2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s)
+        D[i][j] -= D[r][j] * D[i][s] / D[r][s];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; n + 2; j++) <B><FONT COLOR="#A020F0">if</FONT></B> (j != s) D[r][j] /= D[r][s];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m + 2; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (i != r) D[i][s] /= -D[r][s];
+    D[r][s] = 1.0 / D[r][s];
+    swap(B[r], N[s]);
+  }
 
-	<B><FONT COLOR="#228B22">bool</FONT></B> Simplex(<B><FONT COLOR="#228B22">int</FONT></B> phase) {
-		<B><FONT COLOR="#228B22">int</FONT></B> x = phase == 1 ? m + 1 : m;
-		<B><FONT COLOR="#A020F0">while</FONT></B> (true) {
-			<B><FONT COLOR="#228B22">int</FONT></B> s = -1;
-			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt;= n; j++) {
-				<B><FONT COLOR="#A020F0">if</FONT></B> (phase == 2 &amp;&amp; N[j] == -1) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-				<B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[x][j] &lt; D[x][s] || Dabs(D[x][j] - D[x][s]) &lt; EPS &amp;&amp; N[j] &lt; N[s]) s = j;
-			}
-			<B><FONT COLOR="#A020F0">if</FONT></B> (D[x][s] &gt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> true;
-			<B><FONT COLOR="#228B22">int</FONT></B> r = -1;
-			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) {
-				<B><FONT COLOR="#A020F0">if</FONT></B> (D[i][s] &lt; EPS) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-				<B><FONT COLOR="#A020F0">if</FONT></B> (r == -1 || D[i][n + 1] / D[i][s] &lt; D[r][n + 1] / D[r][s] ||
-					Dabs((D[i][n + 1] / D[i][s]) - (D[r][n + 1] / D[r][s])) &lt; EPS &amp;&amp; B[i] &lt; B[r]) r = i;
-			}
-			<B><FONT COLOR="#A020F0">if</FONT></B> (r == -1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
-			Pivot(r, s);
-		}
-	}
+  <B><FONT COLOR="#228B22">bool</FONT></B> Simplex(<B><FONT COLOR="#228B22">int</FONT></B> phase) {
+    <B><FONT COLOR="#228B22">int</FONT></B> x = phase == 1 ? m + 1 : m;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (true) {
+      <B><FONT COLOR="#228B22">int</FONT></B> s = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt;= n; j++) {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (phase == 2 &amp;&amp; N[j] == -1) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[x][j] &lt; D[x][s] || Dabs(D[x][j] - D[x][s]) &lt; EPS &amp;&amp; N[j] &lt; N[s]) s = j;
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (D[x][s] &gt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> true;
+      <B><FONT COLOR="#228B22">int</FONT></B> r = -1;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (D[i][s] &lt; EPS) <B><FONT COLOR="#A020F0">continue</FONT></B>;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (r == -1 || D[i][n + 1] / D[i][s] &lt; D[r][n + 1] / D[r][s] ||
+          Dabs((D[i][n + 1] / D[i][s]) - (D[r][n + 1] / D[r][s])) &lt; EPS &amp;&amp; B[i] &lt; B[r]) r = i;
+      }
+      <B><FONT COLOR="#A020F0">if</FONT></B> (r == -1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+      Pivot(r, s);
+    }
+  }
 
-	DOUBLE Solve(VD &amp;x) {
-		<B><FONT COLOR="#228B22">int</FONT></B> r = 0;
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 1; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (D[i][n + 1] &lt; D[r][n + 1]) r = i;
-		<B><FONT COLOR="#A020F0">if</FONT></B> (D[r][n + 1] &lt; -EPS) {
-			Pivot(r, n);
-			<B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(1) || D[m + 1][n + 1] &lt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> -numeric_limits&lt;DOUBLE&gt;::infinity();
-			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] == -1) {
-				<B><FONT COLOR="#228B22">int</FONT></B> s = -1;
-				<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt;= n; j++)
-					<B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[i][j] &lt; D[i][s] || D[i][j] == D[i][s] &amp;&amp; N[j] &lt; N[s]) s = j;
-				Pivot(i, s);
-			}
-		}
-		<B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(2)) <B><FONT COLOR="#A020F0">return</FONT></B> numeric_limits&lt;DOUBLE&gt;::infinity();
-		x = VD(n);
-		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] &lt; n) x[B[i]] = D[i][n + 1];
-		<B><FONT COLOR="#A020F0">return</FONT></B> D[m][n + 1];
-	}
+  DOUBLE Solve(VD &amp;x) {
+    <B><FONT COLOR="#228B22">int</FONT></B> r = 0;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 1; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (D[i][n + 1] &lt; D[r][n + 1]) r = i;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (D[r][n + 1] &lt; -EPS) {
+      Pivot(r, n);
+      <B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(1) || D[m + 1][n + 1] &lt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> -numeric_limits&lt;DOUBLE&gt;::infinity();
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] == -1) {
+        <B><FONT COLOR="#228B22">int</FONT></B> s = -1;
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt;= n; j++)
+          <B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[i][j] &lt; D[i][s] || D[i][j] == D[i][s] &amp;&amp; N[j] &lt; N[s]) s = j;
+        Pivot(i, s);
+      }
+    }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!Simplex(2)) <B><FONT COLOR="#A020F0">return</FONT></B> numeric_limits&lt;DOUBLE&gt;::infinity();
+    x = VD(n);
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) <B><FONT COLOR="#A020F0">if</FONT></B> (B[i] &lt; n) x[B[i]] = D[i][n + 1];
+    <B><FONT COLOR="#A020F0">return</FONT></B> D[m][n + 1];
+  }
 };
 
 <B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
 
-	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> m = 4;
-	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n = 3;
-	DOUBLE _A[m][n] = {
-		{ 6, -1, 0 },
-		{ -1, -5, 0 },
-		{ 1, 5, 1 },
-		{ -1, -5, -1 }
-	};
-	DOUBLE _b[m] = { 10, -4, 5, -5 };
-	DOUBLE _c[n] = { 1, -1, 0 };
+  <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> m = 4;
+  <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n = 3;
+  DOUBLE _A[m][n] = {
+    { 6, -1, 0 },
+    { -1, -5, 0 },
+    { 1, 5, 1 },
+    { -1, -5, -1 }
+  };
+  DOUBLE _b[m] = { 10, -4, 5, -5 };
+  DOUBLE _c[n] = { 1, -1, 0 };
 
-	VVD A(m);
-	VD b(_b, _b + m);
-	VD c(_c, _c + n);
-	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) A[i] = VD(_A[i], _A[i] + n);
+  VVD A(m);
+  VD b(_b, _b + m);
+  VD c(_c, _c + n);
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) A[i] = VD(_A[i], _A[i] + n);
 
-	LPSolver solver(A, b, c);
-	VD x;
-	DOUBLE value = solver.Solve(x);
+  LPSolver solver(A, b, c);
+  VD x;
+  DOUBLE value = solver.Solve(x);
 
-	cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;VALUE: &quot;</FONT></B> &lt;&lt; value &lt;&lt; endl; <I><FONT COLOR="#B22222">// VALUE: 1.29032
-</FONT></I>	cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;SOLUTION:&quot;</FONT></B>; <I><FONT COLOR="#B22222">// SOLUTION: 1.74194 0.451613 1
-</FONT></I>	<B><FONT COLOR="#A020F0">for</FONT></B> (size_t i = 0; i &lt; x.size(); i++) cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; x[i];
-	cerr &lt;&lt; endl;
-	<B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;VALUE: &quot;</FONT></B> &lt;&lt; value &lt;&lt; endl; <I><FONT COLOR="#B22222">// VALUE: 1.29032
+</FONT></I>  cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;SOLUTION:&quot;</FONT></B>; <I><FONT COLOR="#B22222">// SOLUTION: 1.74194 0.451613 1
+</FONT></I>  <B><FONT COLOR="#A020F0">for</FONT></B> (size_t i = 0; i &lt; x.size(); i++) cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; x[i];
+  cerr &lt;&lt; endl;
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
 }
 </PRE>
 <HR>
