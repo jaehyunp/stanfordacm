@@ -1968,8 +1968,6 @@ using namespace std;
 
 <B><FONT COLOR="#228B22">const</FONT></B> DOUBLE EPS = 1e-9;
 
-DOUBLE <B><FONT COLOR="#0000FF">Dabs</FONT></B>(DOUBLE x) { <B><FONT COLOR="#A020F0">return</FONT></B> x &lt; 0 ? -x : x; }
-
 <B><FONT COLOR="#228B22">struct</FONT></B> LPSolver {
   <B><FONT COLOR="#228B22">int</FONT></B> m, n;
   VI B, N;
@@ -1999,14 +1997,14 @@ DOUBLE <B><FONT COLOR="#0000FF">Dabs</FONT></B>(DOUBLE x) { <B><FONT COLOR="#A02
       <B><FONT COLOR="#228B22">int</FONT></B> s = -1;
       <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt;= n; j++) {
         <B><FONT COLOR="#A020F0">if</FONT></B> (phase == 2 &amp;&amp; N[j] == -1) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-        <B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[x][j] &lt; D[x][s] || Dabs(D[x][j] - D[x][s]) &lt; EPS &amp;&amp; N[j] &lt; N[s]) s = j;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (s == -1 || D[x][j] &lt; D[x][s] || D[x][j] == D[x][s] &amp;&amp; N[j] &lt; N[s]) s = j;
       }
       <B><FONT COLOR="#A020F0">if</FONT></B> (D[x][s] &gt; -EPS) <B><FONT COLOR="#A020F0">return</FONT></B> true;
       <B><FONT COLOR="#228B22">int</FONT></B> r = -1;
       <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) {
         <B><FONT COLOR="#A020F0">if</FONT></B> (D[i][s] &lt; EPS) <B><FONT COLOR="#A020F0">continue</FONT></B>;
         <B><FONT COLOR="#A020F0">if</FONT></B> (r == -1 || D[i][n + 1] / D[i][s] &lt; D[r][n + 1] / D[r][s] ||
-          Dabs((D[i][n + 1] / D[i][s]) - (D[r][n + 1] / D[r][s])) &lt; EPS &amp;&amp; B[i] &lt; B[r]) r = i;
+          (D[i][n + 1] / D[i][s]) == (D[r][n + 1] / D[r][s]) &amp;&amp; B[i] &lt; B[r]) r = i;
       }
       <B><FONT COLOR="#A020F0">if</FONT></B> (r == -1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
       Pivot(r, s);

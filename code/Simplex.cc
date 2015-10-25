@@ -30,8 +30,6 @@ typedef vector<int> VI;
 
 const DOUBLE EPS = 1e-9;
 
-DOUBLE Dabs(DOUBLE x) { return x < 0 ? -x : x; }
-
 struct LPSolver {
   int m, n;
   VI B, N;
@@ -61,14 +59,14 @@ struct LPSolver {
       int s = -1;
       for (int j = 0; j <= n; j++) {
         if (phase == 2 && N[j] == -1) continue;
-        if (s == -1 || D[x][j] < D[x][s] || Dabs(D[x][j] - D[x][s]) < EPS && N[j] < N[s]) s = j;
+        if (s == -1 || D[x][j] < D[x][s] || D[x][j] == D[x][s] && N[j] < N[s]) s = j;
       }
       if (D[x][s] > -EPS) return true;
       int r = -1;
       for (int i = 0; i < m; i++) {
         if (D[i][s] < EPS) continue;
         if (r == -1 || D[i][n + 1] / D[i][s] < D[r][n + 1] / D[r][s] ||
-          Dabs((D[i][n + 1] / D[i][s]) - (D[r][n + 1] / D[r][s])) < EPS && B[i] < B[r]) r = i;
+          (D[i][n + 1] / D[i][s]) == (D[r][n + 1] / D[r][s]) && B[i] < B[r]) r = i;
       }
       if (r == -1) return false;
       Pivot(r, s);
