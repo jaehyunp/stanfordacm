@@ -44,12 +44,13 @@ struct LPSolver {
   }
 
   void Pivot(int r, int s) {
+    double inv = 1.0 / D[r][s];
     for (int i = 0; i < m + 2; i++) if (i != r)
       for (int j = 0; j < n + 2; j++) if (j != s)
-        D[i][j] -= D[r][j] * D[i][s] / D[r][s];
-    for (int j = 0; j < n + 2; j++) if (j != s) D[r][j] /= D[r][s];
-    for (int i = 0; i < m + 2; i++) if (i != r) D[i][s] /= -D[r][s];
-    D[r][s] = 1.0 / D[r][s];
+        D[i][j] -= D[r][j] * D[i][s] * inv;
+    for (int j = 0; j < n + 2; j++) if (j != s) D[r][j] *= inv;
+    for (int i = 0; i < m + 2; i++) if (i != r) D[i][s] *= -inv;
+    D[r][s] = inv;
     swap(B[r], N[s]);
   }
 
