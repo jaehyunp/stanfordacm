@@ -8,6 +8,6 @@ The team notebook is compiled from codes written by previous Stanford team membe
 
 Links
 =====
-[Stanford Local Programming Contest](http://cs.stanford.edu/group/acm/SLPC/)
-[CS 97SI: Introduction to Programming Contests](http://stanford.edu/class/cs97si/)
-[Stanford ACM-ICPC e-mail list](https://mailman.stanford.edu/mailman/listinfo/stanford-acm-icpc)
+* [Stanford Local Programming Contest](http://cs.stanford.edu/group/acm/SLPC/)
+* [CS 97SI: Introduction to Programming Contests](http://stanford.edu/class/cs97si/)
+* [Stanford ACM-ICPC e-mail list](https://mailman.stanford.edu/mailman/listinfo/stanford-acm-icpc)
