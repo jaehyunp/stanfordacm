@@ -10,3 +10,15 @@
 *.vrb
 *.dvi
 *.ps
+
+*.sln
+*.sdf
+*.vcxproj
+*.filters
+*.opendb
+
+Debug
+Release
+x64
+.vs
+*.exe
