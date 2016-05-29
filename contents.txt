@@ -1,0 +1,44 @@
+[Combinatorial optimization]
+Dinic.cc	Sparse max-flow
+MinCostMaxFlow.cc	Min-cost max-flow
+PushRelabel.cc	Push-relabel max-flow	
+MinCostMatching.cc	Min-cost matching
+MaxBipartiteMatching.cc	Max bipartite matchine
+MinCut.cc	Global min-cut
+GraphCutInference.cc	Graph cut inference
+
+[Geometry]
+ConvexHull.cc	Convex hull
+Geometry.cc	Miscellaneous geometry
+JavaGeometry.java	Java geometry
+Geom3D.java	3D geometry
+Delaunay.cc	Slow Delaunay triangulation
+[Numerical algorithms]
+Euclid.cc	Number theory (modular, Chinese remainder, linear Diophantine)
+GaussJordan.cc	Systems of linear equations, matrix inverse, determinant
+ReducedRowEchelonForm.cc	Reduced row echelon form, matrix rank
+FFT_new.cc	Fast Fourier transform
+Simplex.cc	Simplex algorithm
+
+[Graph algorithms]
+FastDijkstra.cc	Fast Dijkstra's algorithm
+SCC.cc	Strongly connected components
+EulerianPath.cc	Eulerian path
+[Data structures]
+SuffixArray.cc	Suffix array
+BIT.cc	Binary Indexed Tree
+UnionFind.cc	Union-find set
+KDTree.cc	KD-tree
+splay.cc	Splay tree
+SegmentTreeLazy.java	Lazy segment tree
+LCA.cc	Lowest common ancestor
+
+[Miscellaneous]
+LongestIncreasingSubsequence.cc	Longest increasing subsequence
+Dates.cc	Dates
+LogLan.java	Regular expressions
+Primes.cc	Prime numbers
+IO.cc	C++ input/output
+KMP.cc	Knuth-Morris-Pratt
+LatLong.cc	Latitude/longitude
+EmacsSettings.txt	Emacs settings
