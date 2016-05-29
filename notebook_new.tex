@@ -1,5 +1,5 @@
 \documentclass[10pt]{article}
-\usepackage[margin=0.5in]{geometry}
+\usepackage[left=0.4in,right=0.4in,top=0.7in,bottom=0.4in]{geometry}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{listings}
@@ -9,62 +9,59 @@
 \usepackage{multicol}
 
 \renewcommand*{\ttdefault}{pcr}
-\renewcommand\cftsecfont{\small\bfseries}
-\renewcommand\cftsecpagefont{\small}
-\renewcommand\cftsubsecfont{\footnotesize}
-\renewcommand\cftsubsecpagefont{\footnotesize}
+\renewcommand\cftsecfont{\fontsize{8}{9}\bfseries}
+\renewcommand\cftsecpagefont{\fontsize{8}{9}\mdseries}
+\renewcommand\cftsubsecfont{\fontsize{5}{6}\mdseries}
+\renewcommand\cftsubsecpagefont{\fontsize{5}{6}\mdseries}
+\renewcommand\cftsecafterpnum{\vspace{-1ex}}
+\renewcommand\cftsubsecafterpnum{\vspace{-1ex}}
 
+\lstdefinestyle{shared}{
+    belowcaptionskip=1\baselineskip,
+    breaklines=true,
+    xleftmargin=\parindent,
+    showstringspaces=false,
+    basicstyle=\fontsize{5.5}{6}\ttfamily,
+}
 \lstdefinestyle{customcc}{
-   language=C++,
-   belowcaptionskip=1\baselineskip,
-   breaklines=true,
-   xleftmargin=\parindent,
-   showstringspaces=false,
-   %basicstyle=\scriptsize\ttfamily,
-   basicstyle=\fontsize{6}{7}\ttfamily,
-   keywordstyle=\bfseries\color{green!40!black},
-   commentstyle=\itshape\color{red!80!black},
-   identifierstyle=\color{blue},
-   stringstyle=\color{purple!40!black},
+	style=shared,
+    language=C++,
+    keywordstyle=\bfseries\color{green!40!black},
+    commentstyle=\itshape\color{red!80!black},
+    identifierstyle=\color{blue},
+    stringstyle=\color{purple!40!black},
 }
 \lstdefinestyle{customjava}{
-   language=Java,
-   belowcaptionskip=1\baselineskip,
-   breaklines=true,
-   xleftmargin=\parindent,
-   showstringspaces=false,
-   basicstyle=\scriptsize\ttfamily,
-   keywordstyle=\bfseries\color{green!40!black},
-   commentstyle=\itshape\color{purple!40!black},
-   identifierstyle=\color{blue},
-   stringstyle=\color{orange},
+    style=shared,
+    language=Java,
+    keywordstyle=\bfseries\color{green!40!black},
+    commentstyle=\itshape\color{purple!40!black},
+    identifierstyle=\color{blue},
+    stringstyle=\color{orange},
+}
+\lstdefinestyle{custompython}{
+    style=shared,
+    language=Python,
+    keywordstyle=\bfseries\color{green!40!black},
+    commentstyle=\itshape\color{purple!40!black},
+    identifierstyle=\color{blue},
+    stringstyle=\color{orange},
 }
 \lstdefinestyle{customtxt}{
-   belowcaptionskip=1\baselineskip,
-   breaklines=true,
-   xleftmargin=\parindent,
-   showstringspaces=false,
-   basicstyle=\scriptsize\ttfamily,
+    style=shared,
 }
 \lstset{escapechar=@}
 
 \pagestyle{fancy}
-\fancyhf{}
 \fancyhead[L]{Stanford University}
-\fancyhead[C]{}
 \fancyhead[R]{\thepage}
-\fancyfoot[L]{}
 \fancyfoot[C]{}
-\fancyfoot[R]{}
 
 \fancypagestyle{plain}
 {
 \fancyhead[L]{Stanford University}
-\fancyhead[C]{}
 \fancyhead[R]{\thepage}
-\fancyfoot[L]{}
 \fancyfoot[C]{}
-\fancyfoot[R]{}
 }
 
 \title{\vspace{-4ex}\Large{Stanford University ICPC Team Notebook (2015-16)}}
@@ -76,7 +73,7 @@
 \begin{multicols}{2}
 
 \maketitle
-\vspace{-10ex}
+\vspace{-13ex}
 \tableofcontents
 \pagestyle{fancy}
 
