@@ -1,4 +1,10 @@
+# Any line followed by a '#' character is ignored
+# Section headings must be in square brackets
+# Subsections within a section should follow the format:
+#   [filename within code directory][tab character \t][subsection title]
+
 [Combinatorial optimization]
+#MaxFlow.cc	Dense max-flow
 Dinic.cc	Sparse max-flow
 MinCostMaxFlow.cc	Min-cost max-flow
 PushRelabel.cc	Push-relabel max-flow	
@@ -6,6 +12,8 @@ MinCostMatching.cc	Min-cost matching
 MaxBipartiteMatching.cc	Max bipartite matchine
 MinCut.cc	Global min-cut
 GraphCutInference.cc	Graph cut inference
+#MaxFlow.java	Max-flow (Java)
+#MinCostMaxFlow.java	Min-cost max-flow (Java)
 
 [Geometry]
 ConvexHull.cc	Convex hull
@@ -13,17 +21,25 @@ Geometry.cc	Miscellaneous geometry
 JavaGeometry.java	Java geometry
 Geom3D.java	3D geometry
 Delaunay.cc	Slow Delaunay triangulation
+#Delaunay.java	Slow Delaunay triangulation (Java)
+
 [Numerical algorithms]
 Euclid.cc	Number theory (modular, Chinese remainder, linear Diophantine)
 GaussJordan.cc	Systems of linear equations, matrix inverse, determinant
 ReducedRowEchelonForm.cc	Reduced row echelon form, matrix rank
 FFT_new.cc	Fast Fourier transform
 Simplex.cc	Simplex algorithm
+#FFT.cc	Fast Fourier transform (C++)
 
 [Graph algorithms]
+#BellmanFord.cc	Bellman-Ford shortest paths with negative edge weights (C++)
+#DijkstraFloyd.cc	Dijkstra and Floyd's algorithm (C++)
 FastDijkstra.cc	Fast Dijkstra's algorithm
 SCC.cc	Strongly connected components
 EulerianPath.cc	Eulerian path
+#Kruskal.cc	Kruskal's algorithm
+#Prim.cc	Minimum spanning trees
+
 [Data structures]
 SuffixArray.cc	Suffix array
 BIT.cc	Binary Indexed Tree
@@ -42,3 +58,11 @@ IO.cc	C++ input/output
 KMP.cc	Knuth-Morris-Pratt
 LatLong.cc	Latitude/longitude
 EmacsSettings.txt	Emacs settings
+#TopologicalSort.cc	Topological sort (C++)
+#Dates.java	Dates (Java)
+#DecFormat.java	Decimal output formatting (Java)
+#RandomSTL.cc	Random STL stuff
+#CSP.cc	Constraint satisfaction problems
+#FastExpo.cc	Fast exponentiation
+#LCS.cc	Longest common subsequence
+#MillerRabin.c	Miller-Rabin Primality Test (C)
