@@ -68,22 +68,22 @@ sub InsertTOC {
     my @contents = `cat $tmpfile`;
     open (FILE, ">$tmpfile2");
     for my $line (@contents){
-	chomp $line;
-	print FILE $line."\n";
-	if ($line eq "<A NAME=\"top\">"){
+        chomp $line;
+        print FILE $line."\n";
+        if ($line eq "<A NAME=\"top\">"){
             print FILE "<CENTER><H1><U>Stanford University ACM Team Notebook (2014-15)</U></H1></CENTER>\n";
-	    print FILE "<H1>Table of Contents</H1>\n";
-	    for (my $i = 0; $i < @filenames; $i++){
-		if ($i == 0 || $filenames[$i][2] ne $filenames[$i-1][2]){
-		    if ($i != 0){ print FILE "</OL>\n"; }
-		    print FILE "<H2>$filenames[$i][2]</H2>\n\n";
-		    print FILE "<OL START=".($i+1).">\n";
-		}
-		print FILE "<LI><A HREF=\"#file".($i+1)."\">$filenames[$i][0]</A></LI>\n";
-	    }
-	    print FILE "</OL>\n";
-	    print FILE "<HR>\n";
-	}
+            print FILE "<H1>Table of Contents</H1>\n";
+            for (my $i = 0; $i < @filenames; $i++){
+                if ($i == 0 || $filenames[$i][2] ne $filenames[$i-1][2]){
+                    if ($i != 0){ print FILE "</OL>\n"; }
+                    print FILE "<H2>$filenames[$i][2]</H2>\n\n";
+                    print FILE "<OL START=".($i+1).">\n";
+                }
+                print FILE "<LI><A HREF=\"#file".($i+1)."\">$filenames[$i][0]</A></LI>\n";
+            }
+            print FILE "</OL>\n";
+            print FILE "<HR>\n";
+        }
     }
     close FILE;
 }
@@ -91,21 +91,21 @@ sub InsertTOC {
 sub Main {
     
     if (@ARGV == 0) {
-	print STDERR "Usage: ./format_notebook.pl CODE_DIR [--no_toc]\n";
-	exit(1);	
+        print STDERR "Usage: ./format_notebook.pl CODE_DIR [--no_toc]\n";
+        exit(1);        
     }
 
     my $code_dir = "";
     my $toggle_add_toc = 1;
     
     for my $arg (@ARGV) {
-	if ($arg eq "--no_toc") {
-	    $toggle_add_toc = 0;
-	} elsif ($code_dir eq "") {
-	    $code_dir = $arg;
-	} else {
-	    print STDERR "Unexpected argument: $arg\n";
-	}
+        if ($arg eq "--no_toc") {
+            $toggle_add_toc = 0;
+        } elsif ($code_dir eq "") {
+            $code_dir = $arg;
+        } else {
+            print STDERR "Unexpected argument: $arg\n";
+        }
     }
 
     my $tmpfile = tmpnam();
@@ -115,7 +115,7 @@ sub Main {
     `g++ -o filter filter.cc`;
     `mkdir filtered`;
     for (my $i = 0; $i < @filenames; $i++) {
-	`./filter < $code_dir/$filenames[$i][1] > filtered/$filenames[$i][1]`;
+        `./filter < $code_dir/$filenames[$i][1] > filtered/$filenames[$i][1]`;
     }    
     
     # initial processing
@@ -125,8 +125,8 @@ sub Main {
 
     # add table of contents
     if ($toggle_add_toc) {
-	&InsertTOC($tmpfile, $tmpfile2);
-	`mv $tmpfile2 $tmpfile`;
+        &InsertTOC($tmpfile, $tmpfile2);
+        `mv $tmpfile2 $tmpfile`;
     }
 
     # remove links to top    
