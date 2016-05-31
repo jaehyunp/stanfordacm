@@ -1,2 +1,1 @@
-* Make notebook production process simpler (maybe LaTeX?)
 * Dinic implementation is not exactly Dinic, but it seems fast enough. Ideally we want to rewrite it.
