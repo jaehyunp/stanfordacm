@@ -1,4 +1,3 @@
-* Dinic implementation is not exactly Dinic, but it seems fast enough. Ideally we want to rewrite it.
 * Write a faster FFT code.
 * Add fast Hadamard transform for solving the following problem:
     Given A[], B[], find C[] such that

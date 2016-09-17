@@ -74,111 +74,103 @@
 </FONT></I><I><FONT COLOR="#B22222">//     - To obtain actual flow values, look at edges with capacity &gt; 0
 </FONT></I><I><FONT COLOR="#B22222">//       (zero capacity edges are residual edges).
 </FONT></I>
-#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
-#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;vector&gt;</FONT></B>
-
+#<B><FONT COLOR="#5F9EA0">include&lt;cstdio&gt;
+</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;
+</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;queue&gt;
+</FONT></B>
 using namespace std;
 <B><FONT COLOR="#228B22">typedef</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> LL;
 
 <B><FONT COLOR="#228B22">struct</FONT></B> Edge {
-  <B><FONT COLOR="#228B22">int</FONT></B> from, to, cap, flow, index;
-  Edge(<B><FONT COLOR="#228B22">int</FONT></B> from, <B><FONT COLOR="#228B22">int</FONT></B> to, <B><FONT COLOR="#228B22">int</FONT></B> cap, <B><FONT COLOR="#228B22">int</FONT></B> flow, <B><FONT COLOR="#228B22">int</FONT></B> index) :
-    from(from), to(to), cap(cap), flow(flow), index(index) {}
-  LL rcap() { <B><FONT COLOR="#A020F0">return</FONT></B> cap - flow; }
+  <B><FONT COLOR="#228B22">int</FONT></B> u, v;
+  LL cap, flow;
+  Edge() {}
+  Edge(<B><FONT COLOR="#228B22">int</FONT></B> u, <B><FONT COLOR="#228B22">int</FONT></B> v, LL cap): u(u), v(v), cap(cap), flow(0) {}
 };
 
 <B><FONT COLOR="#228B22">struct</FONT></B> Dinic {
   <B><FONT COLOR="#228B22">int</FONT></B> N;
-  vector&lt;vector&lt;Edge&gt; &gt; G;
-  vector&lt;vector&lt;Edge *&gt; &gt; Lf;
-  vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; layer;
-  vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; Q;
+  vector&lt;Edge&gt; E;
+  vector&lt;vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt;&gt; g;
+  vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; d, pt;
   
-  Dinic(<B><FONT COLOR="#228B22">int</FONT></B> N) : N(N), G(N), Q(N) {}
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> AddEdge(<B><FONT COLOR="#228B22">int</FONT></B> from, <B><FONT COLOR="#228B22">int</FONT></B> to, <B><FONT COLOR="#228B22">int</FONT></B> cap) {
-    <B><FONT COLOR="#A020F0">if</FONT></B> (from == to) <B><FONT COLOR="#A020F0">return</FONT></B>;
-    G[from].push_back(Edge(from, to, cap, 0, G[to].size()));
-    G[to].push_back(Edge(to, from, 0, 0, G[from].size() - 1));
+  Dinic(<B><FONT COLOR="#228B22">int</FONT></B> N): N(N), E(0), g(N), d(N), pt(N) {}
+
+  <B><FONT COLOR="#228B22">void</FONT></B> AddEdge(<B><FONT COLOR="#228B22">int</FONT></B> u, <B><FONT COLOR="#228B22">int</FONT></B> v, LL cap) {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (u != v) {
+      E.emplace_back(Edge(u, v, cap));
+      g[u].emplace_back(E.size() - 1);
+      E.emplace_back(Edge(v, u, 0));
+      g[v].emplace_back(E.size() - 1);
+    }
   }
 
-  LL BlockingFlow(<B><FONT COLOR="#228B22">int</FONT></B> s, <B><FONT COLOR="#228B22">int</FONT></B> t) {
-    layer.clear(); layer.resize(N, -1);
-    layer[s] = 0;
-    Lf.clear(); Lf.resize(N);
-    
-    <B><FONT COLOR="#228B22">int</FONT></B> head = 0, tail = 0;
-    Q[tail++] = s;
-    <B><FONT COLOR="#A020F0">while</FONT></B> (head &lt; tail) {
-      <B><FONT COLOR="#228B22">int</FONT></B> x = Q[head++];
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; G[x].size(); i++) {
-        Edge &amp;e = G[x][i]; <B><FONT COLOR="#A020F0">if</FONT></B> (e.rcap() &lt;= 0) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-        <B><FONT COLOR="#A020F0">if</FONT></B> (layer[e.to] == -1) {
-          layer[e.to] = layer[e.from] + 1;
-          Q[tail++] = e.to;
-        }
-        <B><FONT COLOR="#A020F0">if</FONT></B> (layer[e.to] &gt; layer[e.from]) {
-          Lf[e.from].push_back(&amp;e);
+  <B><FONT COLOR="#228B22">bool</FONT></B> BFS(<B><FONT COLOR="#228B22">int</FONT></B> S, <B><FONT COLOR="#228B22">int</FONT></B> T) {
+    queue&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; q({S});
+    fill(d.begin(), d.end(), N + 1);
+    d[S] = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B>(!q.empty()) {
+      <B><FONT COLOR="#228B22">int</FONT></B> u = q.front(); q.pop();
+      <B><FONT COLOR="#A020F0">if</FONT></B> (u == T) <B><FONT COLOR="#A020F0">break</FONT></B>;
+      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> k: g[u]) {
+        Edge &amp;e = E[k];
+        <B><FONT COLOR="#A020F0">if</FONT></B> (e.flow &lt; e.cap &amp;&amp; d[e.v] &gt; d[e.u] + 1) {
+          d[e.v] = d[e.u] + 1;
+          q.emplace(e.v);
         }
       }
     }
-    <B><FONT COLOR="#A020F0">if</FONT></B> (layer[t] == -1) <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-
-    LL totflow = 0;
-    vector&lt;Edge *&gt; P;
-    <B><FONT COLOR="#A020F0">while</FONT></B> (!Lf[s].empty()) {
-      <B><FONT COLOR="#228B22">int</FONT></B> curr = P.empty() ? s : P.back()-&gt;to;
-      <B><FONT COLOR="#A020F0">if</FONT></B> (curr == t) { <I><FONT COLOR="#B22222">// Augment
-</FONT></I>        LL amt = P.front()-&gt;rcap();
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; P.size(); ++i) {
-          amt = min(amt, P[i]-&gt;rcap());
-        }
-        totflow += amt;
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = P.size() - 1; i &gt;= 0; --i) {
-          P[i]-&gt;flow += amt;
-          G[P[i]-&gt;to][P[i]-&gt;index].flow -= amt;
-          <B><FONT COLOR="#A020F0">if</FONT></B> (P[i]-&gt;rcap() &lt;= 0) {
-            Lf[P[i]-&gt;from].pop_back();
-            P.resize(i);
-          }
-        }
-      } <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (Lf[curr].empty()) { <I><FONT COLOR="#B22222">// Retreat
-</FONT></I>        P.pop_back();
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; N; ++i)
-          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; Lf[i].size(); ++j)
-            <B><FONT COLOR="#A020F0">if</FONT></B> (Lf[i][j]-&gt;to == curr)
-              Lf[i].erase(Lf[i].begin() + j);
-      } <B><FONT COLOR="#A020F0">else</FONT></B> { <I><FONT COLOR="#B22222">// Advance
-</FONT></I>        P.push_back(Lf[curr].back());
-      }
-    }
-    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+    <B><FONT COLOR="#A020F0">return</FONT></B> d[T] != N + 1;
   }
 
-  LL GetMaxFlow(<B><FONT COLOR="#228B22">int</FONT></B> s, <B><FONT COLOR="#228B22">int</FONT></B> t) {
-    LL totflow = 0;
-    <B><FONT COLOR="#A020F0">while</FONT></B> (LL flow = BlockingFlow(s, t))
-      totflow += flow;
-    <B><FONT COLOR="#A020F0">return</FONT></B> totflow;
+  LL DFS(<B><FONT COLOR="#228B22">int</FONT></B> u, <B><FONT COLOR="#228B22">int</FONT></B> T, LL flow = -1) {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (u == T || flow == 0) <B><FONT COLOR="#A020F0">return</FONT></B> flow;
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> &amp;i = pt[u]; i &lt; g[u].size(); ++i) {
+      Edge &amp;e = E[g[u][i]];
+      Edge &amp;oe = E[g[u][i]^1];
+      <B><FONT COLOR="#A020F0">if</FONT></B> (d[e.v] == d[e.u] + 1) {
+        LL amt = e.cap - e.flow;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (flow != -1 &amp;&amp; amt &gt; flow) amt = flow;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (LL pushed = DFS(e.v, T, amt)) {
+          e.flow += pushed;
+          oe.flow -= pushed;
+          <B><FONT COLOR="#A020F0">return</FONT></B> pushed;
+        }
+      }
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+
+  LL MaxFlow(<B><FONT COLOR="#228B22">int</FONT></B> S, <B><FONT COLOR="#228B22">int</FONT></B> T) {
+    LL total = 0;
+    <B><FONT COLOR="#A020F0">while</FONT></B> (BFS(S, T)) {
+      fill(pt.begin(), pt.end(), 0);
+      <B><FONT COLOR="#A020F0">while</FONT></B> (LL flow = DFS(S, T))
+        total += flow;
+    }
+    <B><FONT COLOR="#A020F0">return</FONT></B> total;
   }
 };
 
 <I><FONT COLOR="#B22222">// BEGIN CUT
 </FONT></I><I><FONT COLOR="#B22222">// The following code solves SPOJ problem #4110: Fast Maximum Flow (FASTFLOW)
 </FONT></I>
-<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
-  <B><FONT COLOR="#228B22">int</FONT></B> n, m;
-  scanf(<B><FONT COLOR="#BC8F8F">&quot;%d%d&quot;</FONT></B>, &amp;n, &amp;m);
-
-  Dinic flow(n);
-  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; m; i++) {
-    <B><FONT COLOR="#228B22">int</FONT></B> a, b, c;
-    scanf(<B><FONT COLOR="#BC8F8F">&quot;%d%d%d&quot;</FONT></B>, &amp;a, &amp;b, &amp;c);
-    <B><FONT COLOR="#A020F0">if</FONT></B> (a == b) <B><FONT COLOR="#A020F0">continue</FONT></B>;
-    flow.AddEdge(a-1, b-1, c);
-    flow.AddEdge(b-1, a-1, c);
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+  <B><FONT COLOR="#228B22">int</FONT></B> N, E;
+  scanf(<B><FONT COLOR="#BC8F8F">&quot;%d%d&quot;</FONT></B>, &amp;N, &amp;E);
+  Dinic dinic(N);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; E; i++)
+  {
+    <B><FONT COLOR="#228B22">int</FONT></B> u, v;
+    LL cap;
+    scanf(<B><FONT COLOR="#BC8F8F">&quot;%d%d%lld&quot;</FONT></B>, &amp;u, &amp;v, &amp;cap);
+    dinic.AddEdge(u - 1, v - 1, cap);
+    dinic.AddEdge(v - 1, u - 1, cap);
   }
-  printf(<B><FONT COLOR="#BC8F8F">&quot;%Ld\n&quot;</FONT></B>, flow.GetMaxFlow(0, n-1));
+  printf(<B><FONT COLOR="#BC8F8F">&quot;%lld\n&quot;</FONT></B>, dinic.MaxFlow(0, N - 1));
   <B><FONT COLOR="#A020F0">return</FONT></B> 0;
 }
 
@@ -834,7 +826,8 @@ using namespace std;
       b[i] *= -1;
     }
     c *= -1;
-#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif
+</FONT></B>
 
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; M; i++) {
       <B><FONT COLOR="#A020F0">if</FONT></B> (b[i] &gt;= 0) {
@@ -853,7 +846,8 @@ using namespace std;
     score += c;
 #<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">MAXIMIZATION</FONT>
     score *= -1;
-#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif
+</FONT></B>
 
     <B><FONT COLOR="#A020F0">return</FONT></B> score;
   }
@@ -939,7 +933,8 @@ T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b
 <B><FONT COLOR="#228B22">bool</FONT></B> <B><FONT COLOR="#0000FF">between</FONT></B>(<B><FONT COLOR="#228B22">const</FONT></B> PT &amp;a, <B><FONT COLOR="#228B22">const</FONT></B> PT &amp;b, <B><FONT COLOR="#228B22">const</FONT></B> PT &amp;c) {
   <B><FONT COLOR="#A020F0">return</FONT></B> (fabs(area2(a,b,c)) &lt; EPS &amp;&amp; (a.x-b.x)*(c.x-b.x) &lt;= 0 &amp;&amp; (a.y-b.y)*(c.y-b.y) &lt;= 0);
 }
-#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif
+</FONT></B>
 
 <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#0000FF">ConvexHull</FONT></B>(vector&lt;PT&gt; &amp;pts) {
   sort(pts.begin(), pts.end());
@@ -968,7 +963,8 @@ T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b
     dn.pop_back();
   }
   pts = dn;
-#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif
+</FONT></B>
 }
 
 <I><FONT COLOR="#B22222">// BEGIN CUT
@@ -1541,7 +1537,8 @@ PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<B><FONT COLOR="#228B22">
 </FONT></I><I><FONT COLOR="#B22222">// OUTPUT:   triples = a vector containing m triples of indices
 </FONT></I><I><FONT COLOR="#B22222">//                     corresponding to triangle vertices
 </FONT></I>
-#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;
+</FONT></B>
 using namespace std;
 
 <B><FONT COLOR="#228B22">typedef</FONT></B> <B><FONT COLOR="#228B22">double</FONT></B> T;
@@ -2299,7 +2296,8 @@ Expected:
 <H1>code/SCC.cc 19/27</H1>
 [<A HREF="#top">top</A>][<A HREF="#file18">prev</A>][<A HREF="#file20">next</A>]
 <PRE>
-#<B><FONT COLOR="#5F9EA0">include&lt;memory.h&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;memory.h&gt;
+</FONT></B>
 <B><FONT COLOR="#228B22">struct</FONT></B> edge{<B><FONT COLOR="#228B22">int</FONT></B> e, nxt;};
 <B><FONT COLOR="#228B22">int</FONT></B> V, E;
 edge e[MAXE], er[MAXE];
@@ -2476,7 +2474,8 @@ using namespace std;
   }
 }
 
-#<B><FONT COLOR="#5F9EA0">else</FONT></B>
+#<B><FONT COLOR="#5F9EA0">else
+</FONT></B>
 <I><FONT COLOR="#B22222">// END CUT
 </FONT></I><B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
 
@@ -2497,7 +2496,8 @@ using namespace std;
   cout &lt;&lt; suffix.LongestCommonPrefix(0, 2) &lt;&lt; endl;
 }
 <I><FONT COLOR="#B22222">// BEGIN CUT
-</FONT></I>#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+</FONT></I>#<B><FONT COLOR="#5F9EA0">endif
+</FONT></B>
 <I><FONT COLOR="#B22222">// END CUT
 </FONT></I></PRE>
 <HR>
@@ -2551,10 +2551,23 @@ using namespace std;
 <H1>code/UnionFind.cc 23/27</H1>
 [<A HREF="#top">top</A>][<A HREF="#file22">prev</A>][<A HREF="#file24">next</A>]
 <PRE>
-<I><FONT COLOR="#B22222">//union-find set: the vector/array contains the parent of each node
-</FONT></I><B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">find</FONT></B>(vector &lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt;&amp; C, <B><FONT COLOR="#228B22">int</FONT></B> x){<B><FONT COLOR="#A020F0">return</FONT></B> (C[x]==x) ? x : C[x]=find(C, C[x]);} <I><FONT COLOR="#B22222">//C++
-</FONT></I><B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">find</FONT></B>(<B><FONT COLOR="#228B22">int</FONT></B> x){<B><FONT COLOR="#A020F0">return</FONT></B> (C[x]==x)?x:C[x]=find(C[x]);} <I><FONT COLOR="#B22222">//C
-</FONT></I></PRE>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;vector&gt;</FONT></B>
+using namespace std;
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">find</FONT></B>(vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; &amp;C, <B><FONT COLOR="#228B22">int</FONT></B> x) { <B><FONT COLOR="#A020F0">return</FONT></B> (C[x] == x) ? x : C[x] = find(C, C[x]); }
+<B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#0000FF">merge</FONT></B>(vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; &amp;C, <B><FONT COLOR="#228B22">int</FONT></B> x, <B><FONT COLOR="#228B22">int</FONT></B> y) { C[find(C, x)] = find(C, y); }
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+	<B><FONT COLOR="#228B22">int</FONT></B> n = 5;
+	vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; C(n);
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++) C[i] = i;
+	merge(C, 0, 2);
+	merge(C, 1, 0);
+	merge(C, 3, 4);
+	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n; i++) cout &lt;&lt; i &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; find(C, i) &lt;&lt; endl;
+	<B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
 <HR>
 <A NAME="file24">
 <H1>code/KDTree.cc 24/27</H1>

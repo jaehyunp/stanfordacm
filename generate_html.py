@@ -50,6 +50,7 @@ def get_html_enscript(sections):
     filenames = []
     for (_, subsections) in sections:
         filenames += [code_dir + '/' + filename for (filename, _) in subsections]
+        print(enscript_options + filenames)
     bstr = subprocess.check_output(enscript_options + filenames)
     return bstr.decode('utf-8')
 
