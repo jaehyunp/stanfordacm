@@ -2,3 +2,4 @@
 * Add fast Hadamard transform for solving the following problem:
     Given A[], B[], find C[] such that
       C[i] = sum_j A[j] B[i xor j]
+* Error-check the codes in stanford-cardinal-16 and merge them to the existing code base.

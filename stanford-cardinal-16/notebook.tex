@@ -1,0 +1,215 @@
+\documentclass[letterpaper,landscape]{article}
+\usepackage{minitoc}
+\usepackage{fullpage,enumitem,amsmath,amssymb,graphicx,algpseudocode,algorithm,array}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{minted}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage[margin=12pt,top=30pt,headsep=6pt,headheight=12pt]{geometry}
+
+\setminted{fontsize=\footnotesize,
+           frame=single,framesep=6pt,
+           linenos,numbersep=6pt,xleftmargin=12pt,
+           breaklines=true}
+\usemintedstyle{colorful}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Stanford Cardinal '16 Notebook}
+\rhead{\thepage/24}
+\chead{\leftmark}
+
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{\setstretch{0.1}}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{\setstretch{0.1}}
+
+%\title{Stanford Cardinal '16 Notebook}
+\begin{document}
+
+\begingroup
+\let\cleardoublepage\clearpage
+\endgroup
+
+\begin{multicols*}{2}
+
+  %\raggedcolumns  
+
+  \tableofcontents
+  \clearpage
+  
+  \section{Graph Algorithms}
+
+  \subsection{SAP Maximum flow}
+  \inputminted{cpp}{src/graph_maxflow.cpp}
+  
+  \subsection{Dinic's maximum flow}
+  \inputminted{cpp}{src/graph_dinic.cpp}
+
+  \subsection{Min-cost max-flow}
+  \inputminted{cpp}{src/graph_mincost_maxflow.cpp}
+
+  \subsection{Min-cost max-flow 2}
+  \inputminted{cpp}{src/graph_mincost_maxflow_2.cpp}
+
+  \subsection{Kuhn-Munkres bipartite matching}
+  \inputminted{cpp}{src/KM.cpp}
+
+  \subsection{Hopcroft-Karp bipartite matching}
+  \inputminted{cpp}{src/graph_hopcroft_karp.cpp}
+
+  \subsection{Biconnected components}
+  \inputminted{cpp}{src/graph_bcc.cpp}
+
+  \subsection{Tarjan's SCC, articulation points, bridges}
+  \inputminted{cpp}{src/graph_scc.cpp}
+  
+  \subsection{Global min-cut}
+  \inputminted{cpp}{src/Stoer-Wagner.cpp}
+
+  \subsection{Constructing Euler Tour}
+  \inputminted{cpp}{src/Euler.cpp}
+  
+  \section{Math}
+  
+  \subsection{Combinatorial formulas}
+  
+   $\sum_{k=0}^{n}k^{2}=n(n+1)(2n+1)/6$\\
+   $\sum_{k=0}^{n}k^{3}=n^{2}(n+1)^{2}/4$\\
+   $\sum_{k=0}^{n}k^{4}=(6n^{5}+15n^{4}+10n^{3}-n)/30$\\
+   $\sum_{k=0}^{n}k^{5}=(2n^{6}+6n^{5}+5n^{4}-n^{2})/12$\\
+   $\sum_{k=0}^{n}x^{k}=(x^{n+1}-1)/(x-1)$\\
+   $\sum_{k=0}^{n}kx^{k}=(x-(n+1)x^{n+1}+nx^{n+2})/(x-1)^{2}$\\
+   ${n \choose k}=\frac{n!}{(n-k)!k!}$\\
+   ${n \choose k}={n-1 \choose k}+{n-1 \choose k-1}$\\
+   ${n \choose k}=\frac{n}{n-k}{n-1 \choose k}$\\
+   ${n \choose k}=\frac{n-k+1}{k}{n \choose k-1}$\\
+   ${n+1 \choose k}=\frac{n+1}{n-k+1}{n \choose k}$\\
+   ${n \choose k+1}=\frac{n-k}{k+1}{n \choose k}$\\
+   $\sum_{k=1}^{n}k\tbinom{n}{k}=n2^{n-1}$\\
+   $\sum_{k=1}^{n}k^{2}\tbinom{n}{k}=(n+n^{2})2^{n-2}$\\
+   ${m+n \choose r}=\sum_{k=0}^{r}{m \choose k}{n \choose r-k}$\\
+   ${n \choose k}=\prod_{i=1}^{k}\frac{n-k+i}{i}$\\
+   
+
+%  \subsection{Miller-Rabin primality testing \& Pollard-Rho factorization}
+%  \inputminted{cpp}{src/math_pollard_rho.cpp}
+  
+  \subsection{Number theory identities}
+ \textbf{Lucas' Theorem:} For non-negative integers $m$ and $n$ and a prime $p$,
+ 
+ $$\binom{m}{n}\equiv\prod_{i=0}^k\binom{m_i}{n_i}\pmod p,$$
+where
+$$m=m_kp^k+m_{k-1}p^{k-1}+\cdots +m_1p+m_0$$
+is the base $p$ representation of $m$, and similarly for $n$.
+  
+  \inputminted{cpp}{src/math_finite_fields.cpp}
+  \inputminted{cpp}{src/primes.cpp}
+  
+  \subsection{Burnside's Lemma}
+  Let $G$ be a finite group that acts on a set $X$. For each $g$ in $G$ let $X^g$ denote the set of elements in $X$ that are fixed by $g$, which means $X^g=\{x\in X| g(x)=x\}$. Burnside's lemma assers the following formula for the number of orbits, denoted $|X/G|$:
+  \begin{align*}
+  |X/G|=\frac{1}{|G|} \sum_{g\in G} |X^g|
+  \end{align*}
+  
+  \subsection{NTT}
+  \inputminted{cpp}{src/math_ntt.cpp}
+
+  \subsection{FFT}
+  \inputminted{cpp}{src/math_fft.cpp}
+
+  \subsection{Simplex}
+  \inputminted{cpp}{src/math_simplex.cpp}
+
+  \subsection{Numerical integration}
+  RK4: to integrate $\dot{y} = f(t, y)$ with $y_0 = y(t_0)$, compute
+  \begin{align*}
+  	k_1 &= f(t_n, y_n) \\
+    k_2 &= f(t_n + \frac h 2, y_n + \frac h 2 k_1) \\
+    k_3 &= f(t_n + \frac h 2, y_n + \frac h 2 k_2) \\
+    k_4 &= f(t_n + h, y_n + h k_3) \\
+    y_{n+1} &= y_n + \frac h 6 (k_1 + 2k_2 + 2k_3 + k_4) 
+  \end{align*}
+  
+  \subsection{Partition function}
+  \inputminted{cpp}{src/partition.cpp}
+  
+  \section{String Algorithms}
+
+  \subsection{KMP}
+  \inputminted{cpp}{src/string_KMP.cpp}
+
+  \subsection{Aho-Corasick trie/automaton}
+  \inputminted{cpp}{src/string_AC.cpp}
+
+  \subsection{Suffix array}
+  \inputminted{cpp}{src/string_SA.cpp}
+
+  \subsection{Suffix array}
+  \inputminted{cpp}{src/string_SA_nlogn_pear.cpp}
+
+  \subsection{Permuted LCP}
+  \inputminted{cpp}{src/string_kasai.cpp}
+  
+  \subsection{Suffix tree}
+  \inputminted{cpp}{src/string_ukkonen.cpp}
+
+  \subsection{Suffix automaton}
+  \inputminted{cpp}{src/string_suffix_automaton.cpp}
+  
+  \subsection{Z-function}
+  \inputminted{cpp}{src/string_z_function.cpp}
+
+  \section{Data structures}
+
+  \subsection{Dynamic convex hull}
+  \inputminted{cpp}{src/ds_dynamic_convex_hull.cpp}
+
+  \subsection{Treap}
+  \inputminted{cpp}{src/ds_treap.cpp}
+
+  \subsection{Splay tree}
+  \inputminted{cpp}{src/ds_splay_tree.cpp}
+
+  \subsection{Link-cut tree}
+  \inputminted{cpp}{src/ds_link_cut_tree.cpp}
+
+  \subsection{Centroid decomposition}
+  \inputminted{cpp}{src/ds_centroid_decomposition.cpp}
+
+  \subsection{Heavy-light decomposition}
+  \inputminted{cpp}{src/ds_heavy_light_decomposition.cpp}
+
+  \subsection{Hash table}
+  \inputminted{cpp}{src/ds_hash_table.cpp}
+  
+  \subsection{KD-tree}
+  \inputminted{cpp}{src/KDTree.cpp}
+  
+  \subsection{PB DS}
+  \inputminted{cpp}{src/ds_pbds.cpp}
+
+  \section{Geometry}
+
+  \subsection{C++ geometry}
+  \inputminted{cpp}{src/geom_library.cpp}
+  
+  \subsection{Java geometry}
+  \inputminted{java}{src/JavaGeometry.java}
+  
+  \subsection{Java 3D geometry}
+  \inputminted{java}{src/Geom3D.java}
+
+  \section{Misc}
+
+  \subsection{Virtual tree DP}
+  \inputminted{cpp}{src/misc_virtual_tree.cpp}
+  
+  \subsection{Dates}
+  \inputminted{cpp}{src/dates.cpp}
+  
+\end{multicols*}
+
+\end{document}

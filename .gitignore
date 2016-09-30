@@ -22,3 +22,6 @@ Release
 x64
 .vs
 *.exe
+
+!suffix-array.pdf
+!cheat_sheet.pdf
