@@ -9,7 +9,7 @@ Dinic.cc	Sparse max-flow
 MinCostMaxFlow.cc	Min-cost max-flow
 PushRelabel.cc	Push-relabel max-flow	
 MinCostMatching.cc	Min-cost matching
-MaxBipartiteMatching.cc	Max bipartite matchine
+MaxBipartiteMatching.cc	Max bipartite matching
 MinCut.cc	Global min-cut
 GraphCutInference.cc	Graph cut inference
 #MaxFlow.java	Max-flow (Java)
