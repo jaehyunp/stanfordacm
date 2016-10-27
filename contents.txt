@@ -9,7 +9,7 @@ Dinic.cc	Sparse max-flow
 MinCostMaxFlow.cc	Min-cost max-flow
 PushRelabel.cc	Push-relabel max-flow	
 MinCostMatching.cc	Min-cost matching
-MaxBipartiteMatching.cc	Max bipartite matchine
+MaxBipartiteMatching.cc	Max bipartite matching
 MinCut.cc	Global min-cut
 GraphCutInference.cc	Graph cut inference
 #MaxFlow.java	Max-flow (Java)
@@ -34,7 +34,7 @@ Simplex.cc	Simplex algorithm
 [Graph algorithms]
 #BellmanFord.cc	Bellman-Ford shortest paths with negative edge weights (C++)
 #DijkstraFloyd.cc	Dijkstra and Floyd's algorithm (C++)
-FastDijkstra.cc	Fast Dijkstra's algorithm
+FastDijkstra.cc	Fast Dijkstra algorithm
 SCC.cc	Strongly connected components
 EulerianPath.cc	Eulerian path
 #Kruskal.cc	Kruskal's algorithm
