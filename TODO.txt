@@ -3,4 +3,3 @@
     Given A[], B[], find C[] such that
       C[i] = sum_j A[j] B[i xor j]
 * Error-check the codes in stanford-cardinal-16 and merge them to the existing code base.
-* Apostrophes in the title of a code file are translated as a accent in LaTeX; need to correct the behavior.

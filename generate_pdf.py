@@ -40,8 +40,8 @@ def get_style(filename):
 
 # TODO: check if this is everything we need
 def texify(s):
-    s = s.replace('\'', '\\\'')
-    s = s.replace('\"', '\\\"')
+    #s = s.replace('\'', '\\\'')
+    #s = s.replace('\"', '\\\"')
     return s
 
 def get_tex(sections):
