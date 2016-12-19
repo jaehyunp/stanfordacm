@@ -12,10 +12,10 @@ def get_sections():
             line = line.strip()
             if len(line) == 0: continue
             if line[0] == '[':
-                if section_name is not None:
-                    sections.append((section_name, subsections))
                 section_name = line[1:-1]
                 subsections = []
+                if section_name is not None:
+                    sections.append((section_name, subsections))
             else:
                 tmp = line.split('\t', 1)
                 if len(tmp) == 1:
