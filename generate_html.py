@@ -43,6 +43,8 @@ def get_sections():
                 if subsection_name is None:
                     raise ValueError('Subsection given without section')
                 subsections.append((filename, subsection_name))
+    if section_name is not None:
+        sections.append((section_name, subsections))
     return sections
 
 def get_html_enscript(sections):
@@ -50,7 +52,6 @@ def get_html_enscript(sections):
     filenames = []
     for (_, subsections) in sections:
         filenames += [code_dir + '/' + filename for (filename, _) in subsections]
-        print(enscript_options + filenames)
     bstr = subprocess.check_output(enscript_options + filenames)
     return bstr.decode('utf-8')
 

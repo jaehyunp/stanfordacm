@@ -54,9 +54,21 @@
 <LI><A HREF="#file26">Lazy segment tree</A></LI>
 <LI><A HREF="#file27">Lowest common ancestor</A></LI>
 </OL>
+<H2>Miscellaneous</H2>
+
+<OL START=28>
+<LI><A HREF="#file28">Longest increasing subsequence</A></LI>
+<LI><A HREF="#file29">Dates</A></LI>
+<LI><A HREF="#file30">Regular expressions</A></LI>
+<LI><A HREF="#file31">Prime numbers</A></LI>
+<LI><A HREF="#file32">C++ input/output</A></LI>
+<LI><A HREF="#file33">Knuth-Morris-Pratt</A></LI>
+<LI><A HREF="#file34">Latitude/longitude</A></LI>
+<LI><A HREF="#file35">Emacs settings</A></LI>
+</OL>
 <HR>
 <A NAME="file1">
-<H1>code/Dinic.cc 1/27</H1>
+<H1>code/Dinic.cc 1/35</H1>
 [<A HREF="#top">top</A>][prev][<A HREF="#file2">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Adjacency list implementation of Dinic's blocking flow algorithm.
@@ -74,12 +86,9 @@
 </FONT></I><I><FONT COLOR="#B22222">//     - To obtain actual flow values, look at edges with capacity &gt; 0
 </FONT></I><I><FONT COLOR="#B22222">//       (zero capacity edges are residual edges).
 </FONT></I>
-#<B><FONT COLOR="#5F9EA0">include&lt;cstdio&gt;
-</FONT></B>
-#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;
-</FONT></B>
-#<B><FONT COLOR="#5F9EA0">include&lt;queue&gt;
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;cstdio&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;queue&gt;</FONT></B>
 using namespace std;
 <B><FONT COLOR="#228B22">typedef</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> LL;
 
@@ -178,7 +187,7 @@ using namespace std;
 </FONT></I></PRE>
 <HR>
 <A NAME="file2">
-<H1>code/MinCostMaxFlow.cc 2/27</H1>
+<H1>code/MinCostMaxFlow.cc 2/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file1">prev</A>][<A HREF="#file3">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Implementation of min cost max flow algorithm using adjacency
@@ -318,7 +327,7 @@ using namespace std;
 </FONT></I></PRE>
 <HR>
 <A NAME="file3">
-<H1>code/PushRelabel.cc 3/27</H1>
+<H1>code/PushRelabel.cc 3/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file2">prev</A>][<A HREF="#file4">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Adjacency list implementation of FIFO push relabel maximum flow
@@ -461,7 +470,7 @@ using namespace std;
 </FONT></I></PRE>
 <HR>
 <A NAME="file4">
-<H1>code/MinCostMatching.cc 4/27</H1>
+<H1>code/MinCostMatching.cc 4/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file3">prev</A>][<A HREF="#file5">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">//////////////////////////////////////////////////////////////////////
@@ -596,7 +605,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file5">
-<H1>code/MaxBipartiteMatching.cc 5/27</H1>
+<H1>code/MaxBipartiteMatching.cc 5/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file4">prev</A>][<A HREF="#file6">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// This code performs maximum bipartite matching.
@@ -643,7 +652,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file6">
-<H1>code/MinCut.cc 6/27</H1>
+<H1>code/MinCut.cc 6/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file5">prev</A>][<A HREF="#file7">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Adjacency matrix implementation of Stoer-Wagner min cut algorithm.
@@ -723,7 +732,7 @@ pair&lt;<B><FONT COLOR="#228B22">int</FONT></B>, VI&gt; GetMinCut(VVI &amp;weigh
 </FONT></I></PRE>
 <HR>
 <A NAME="file7">
-<H1>code/GraphCutInference.cc 7/27</H1>
+<H1>code/GraphCutInference.cc 7/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file6">prev</A>][<A HREF="#file8">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Special-purpose {0,1} combinatorial optimization solver for
@@ -826,8 +835,7 @@ using namespace std;
       b[i] *= -1;
     }
     c *= -1;
-#<B><FONT COLOR="#5F9EA0">endif
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
 
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; M; i++) {
       <B><FONT COLOR="#A020F0">if</FONT></B> (b[i] &gt;= 0) {
@@ -846,8 +854,7 @@ using namespace std;
     score += c;
 #<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">MAXIMIZATION</FONT>
     score *= -1;
-#<B><FONT COLOR="#5F9EA0">endif
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
 
     <B><FONT COLOR="#A020F0">return</FONT></B> score;
   }
@@ -890,7 +897,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file8">
-<H1>code/ConvexHull.cc 8/27</H1>
+<H1>code/ConvexHull.cc 8/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file7">prev</A>][<A HREF="#file9">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Compute the 2D convex hull of a set of points using the monotone chain
@@ -933,8 +940,7 @@ T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b
 <B><FONT COLOR="#228B22">bool</FONT></B> <B><FONT COLOR="#0000FF">between</FONT></B>(<B><FONT COLOR="#228B22">const</FONT></B> PT &amp;a, <B><FONT COLOR="#228B22">const</FONT></B> PT &amp;b, <B><FONT COLOR="#228B22">const</FONT></B> PT &amp;c) {
   <B><FONT COLOR="#A020F0">return</FONT></B> (fabs(area2(a,b,c)) &lt; EPS &amp;&amp; (a.x-b.x)*(c.x-b.x) &lt;= 0 &amp;&amp; (a.y-b.y)*(c.y-b.y) &lt;= 0);
 }
-#<B><FONT COLOR="#5F9EA0">endif
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
 
 <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#0000FF">ConvexHull</FONT></B>(vector&lt;PT&gt; &amp;pts) {
   sort(pts.begin(), pts.end());
@@ -963,8 +969,7 @@ T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b
     dn.pop_back();
   }
   pts = dn;
-#<B><FONT COLOR="#5F9EA0">endif
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
 }
 
 <I><FONT COLOR="#B22222">// BEGIN CUT
@@ -1004,7 +1009,7 @@ T area2(PT a, PT b, PT c) { <B><FONT COLOR="#A020F0">return</FONT></B> cross(a,b
 </FONT></I></PRE>
 <HR>
 <A NAME="file9">
-<H1>code/Geometry.cc 9/27</H1>
+<H1>code/Geometry.cc 9/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file8">prev</A>][<A HREF="#file10">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// C++ routines for computational geometry.
@@ -1311,7 +1316,7 @@ PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<B><FONT COLOR="#228B22">
 </PRE>
 <HR>
 <A NAME="file10">
-<H1>code/JavaGeometry.java 10/27</H1>
+<H1>code/JavaGeometry.java 10/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file9">prev</A>][<A HREF="#file11">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// In this example, we read an input file containing three lines, each
@@ -1461,7 +1466,7 @@ PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<B><FONT COLOR="#228B22">
 </PRE>
 <HR>
 <A NAME="file11">
-<H1>code/Geom3D.java 11/27</H1>
+<H1>code/Geom3D.java 11/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file10">prev</A>][<A HREF="#file12">next</A>]
 <PRE>
 <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> Geom3D {
@@ -1523,7 +1528,7 @@ PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<B><FONT COLOR="#228B22">
 </PRE>
 <HR>
 <A NAME="file12">
-<H1>code/Delaunay.cc 12/27</H1>
+<H1>code/Delaunay.cc 12/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file11">prev</A>][<A HREF="#file13">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Slow but simple Delaunay triangulation. Does not handle
@@ -1537,8 +1542,7 @@ PT <B><FONT COLOR="#0000FF">ComputeCentroid</FONT></B>(<B><FONT COLOR="#228B22">
 </FONT></I><I><FONT COLOR="#B22222">// OUTPUT:   triples = a vector containing m triples of indices
 </FONT></I><I><FONT COLOR="#B22222">//                     corresponding to triangle vertices
 </FONT></I>
-#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;vector&gt;</FONT></B>
 using namespace std;
 
 <B><FONT COLOR="#228B22">typedef</FONT></B> <B><FONT COLOR="#228B22">double</FONT></B> T;
@@ -1594,7 +1598,7 @@ vector&lt;triple&gt; delaunayTriangulation(vector&lt;T&gt;&amp; x, vector&lt;T&g
 </PRE>
 <HR>
 <A NAME="file13">
-<H1>code/Euclid.cc 13/27</H1>
+<H1>code/Euclid.cc 13/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file12">prev</A>][<A HREF="#file14">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// This is a collection of useful code for solving problems that
@@ -1757,7 +1761,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file14">
-<H1>code/GaussJordan.cc 14/27</H1>
+<H1>code/GaussJordan.cc 14/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file13">prev</A>][<A HREF="#file15">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Gauss-Jordan elimination with full pivoting.
@@ -1869,7 +1873,7 @@ T GaussJordan(VVT &amp;a, VVT &amp;b) {
 </PRE>
 <HR>
 <A NAME="file15">
-<H1>code/ReducedRowEchelonForm.cc 15/27</H1>
+<H1>code/ReducedRowEchelonForm.cc 15/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file14">prev</A>][<A HREF="#file16">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Reduced row echelon form via Gauss-Jordan elimination 
@@ -1949,7 +1953,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file16">
-<H1>code/FFT_new.cc 16/27</H1>
+<H1>code/FFT_new.cc 16/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file15">prev</A>][<A HREF="#file17">next</A>]
 <PRE>
 #<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;cassert&gt;</FONT></B>
@@ -2090,7 +2094,7 @@ cpx <B><FONT COLOR="#0000FF">EXP</FONT></B>(<B><FONT COLOR="#228B22">double</FON
 </PRE>
 <HR>
 <A NAME="file17">
-<H1>code/Simplex.cc 17/27</H1>
+<H1>code/Simplex.cc 17/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file16">prev</A>][<A HREF="#file18">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Two-phase simplex algorithm for solving linear programs of the form
@@ -2220,7 +2224,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file18">
-<H1>code/FastDijkstra.cc 18/27</H1>
+<H1>code/FastDijkstra.cc 18/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file17">prev</A>][<A HREF="#file19">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Implementation of Dijkstra's algorithm using adjacency lists
@@ -2293,11 +2297,10 @@ Expected:
 */</FONT></I></PRE>
 <HR>
 <A NAME="file19">
-<H1>code/SCC.cc 19/27</H1>
+<H1>code/SCC.cc 19/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file18">prev</A>][<A HREF="#file20">next</A>]
 <PRE>
-#<B><FONT COLOR="#5F9EA0">include&lt;memory.h&gt;
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include&lt;memory.h&gt;</FONT></B>
 <B><FONT COLOR="#228B22">struct</FONT></B> edge{<B><FONT COLOR="#228B22">int</FONT></B> e, nxt;};
 <B><FONT COLOR="#228B22">int</FONT></B> V, E;
 edge e[MAXE], er[MAXE];
@@ -2337,7 +2340,7 @@ edge e[MAXE], er[MAXE];
 </PRE>
 <HR>
 <A NAME="file20">
-<H1>code/EulerianPath.cc 20/27</H1>
+<H1>code/EulerianPath.cc 20/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file19">prev</A>][<A HREF="#file21">next</A>]
 <PRE>
 <B><FONT COLOR="#228B22">struct</FONT></B> Edge;
@@ -2383,7 +2386,7 @@ vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; path;
 </PRE>
 <HR>
 <A NAME="file21">
-<H1>code/SuffixArray.cc 21/27</H1>
+<H1>code/SuffixArray.cc 21/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file20">prev</A>][<A HREF="#file22">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// Suffix array construction in O(L log^2 L) time.  Routine for
@@ -2474,8 +2477,7 @@ using namespace std;
   }
 }
 
-#<B><FONT COLOR="#5F9EA0">else
-</FONT></B>
+#<B><FONT COLOR="#5F9EA0">else</FONT></B>
 <I><FONT COLOR="#B22222">// END CUT
 </FONT></I><B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>() {
 
@@ -2496,13 +2498,12 @@ using namespace std;
   cout &lt;&lt; suffix.LongestCommonPrefix(0, 2) &lt;&lt; endl;
 }
 <I><FONT COLOR="#B22222">// BEGIN CUT
-</FONT></I>#<B><FONT COLOR="#5F9EA0">endif
-</FONT></B>
+</FONT></I>#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
 <I><FONT COLOR="#B22222">// END CUT
 </FONT></I></PRE>
 <HR>
 <A NAME="file22">
-<H1>code/BIT.cc 22/27</H1>
+<H1>code/BIT.cc 22/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file21">prev</A>][<A HREF="#file23">next</A>]
 <PRE>
 #<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
@@ -2548,7 +2549,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file23">
-<H1>code/UnionFind.cc 23/27</H1>
+<H1>code/UnionFind.cc 23/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file22">prev</A>][<A HREF="#file24">next</A>]
 <PRE>
 #<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
@@ -2570,7 +2571,7 @@ using namespace std;
 </PRE>
 <HR>
 <A NAME="file24">
-<H1>code/KDTree.cc 24/27</H1>
+<H1>code/KDTree.cc 24/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file23">prev</A>][<A HREF="#file25">next</A>]
 <PRE>
 <I><FONT COLOR="#B22222">// -----------------------------------------------------------------
@@ -2784,7 +2785,7 @@ using namespace std;
 </FONT></I></PRE>
 <HR>
 <A NAME="file25">
-<H1>code/splay.cc 25/27</H1>
+<H1>code/splay.cc 25/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file24">prev</A>][<A HREF="#file26">next</A>]
 <PRE>
 #<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;cstdio&gt;</FONT></B>
@@ -2939,7 +2940,7 @@ Node *<B><FONT COLOR="#0000FF">makeTree</FONT></B>(Node *p, <B><FONT COLOR="#228
 </PRE>
 <HR>
 <A NAME="file26">
-<H1>code/SegmentTreeLazy.java 26/27</H1>
+<H1>code/SegmentTreeLazy.java 26/35</H1>
 [<A HREF="#top">top</A>][<A HREF="#file25">prev</A>][<A HREF="#file27">next</A>]
 <PRE>
 <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> SegmentTreeRangeUpdate {
@@ -3011,8 +3012,8 @@ Node *<B><FONT COLOR="#0000FF">makeTree</FONT></B>(Node *p, <B><FONT COLOR="#228
 }</PRE>
 <HR>
 <A NAME="file27">
-<H1>code/LCA.cc 27/27</H1>
-[<A HREF="#top">top</A>][<A HREF="#file26">prev</A>][next]
+<H1>code/LCA.cc 27/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file26">prev</A>][<A HREF="#file28">next</A>]
 <PRE>
 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_nodes, log_max_nodes;
 <B><FONT COLOR="#228B22">int</FONT></B> num_nodes, log_num_nodes, root;
@@ -3098,6 +3099,449 @@ vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; children[max_nodes];	<I><F
     
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
 }
+</PRE>
+<HR>
+<A NAME="file28">
+<H1>code/LongestIncreasingSubsequence.cc 28/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file27">prev</A>][<A HREF="#file29">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">// Given a list of numbers of length n, this routine extracts a 
+</FONT></I><I><FONT COLOR="#B22222">// longest increasing subsequence.
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// Running time: O(n log n)
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   INPUT: a vector of integers
+</FONT></I><I><FONT COLOR="#B22222">//   OUTPUT: a vector containing the longest increasing subsequence
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;vector&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;algorithm&gt;</FONT></B>
+
+using namespace std;
+
+<B><FONT COLOR="#228B22">typedef</FONT></B> vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; VI;
+<B><FONT COLOR="#228B22">typedef</FONT></B> pair&lt;<B><FONT COLOR="#228B22">int</FONT></B>,<B><FONT COLOR="#228B22">int</FONT></B>&gt; PII;
+<B><FONT COLOR="#228B22">typedef</FONT></B> vector&lt;PII&gt; VPII;
+
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">STRICTLY_INCREASNG</FONT>
+
+VI <B><FONT COLOR="#0000FF">LongestIncreasingSubsequence</FONT></B>(VI v) {
+  VPII best;
+  VI dad(v.size(), -1);
+  
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; v.size(); i++) {
+#<B><FONT COLOR="#5F9EA0">ifdef</FONT></B> <FONT COLOR="#B8860B">STRICTLY_INCREASNG</FONT>
+    PII item = make_pair(v[i], 0);
+    <B><FONT COLOR="#5F9EA0">VPII</FONT></B>::iterator it = lower_bound(best.begin(), best.end(), item);
+    item.second = i;
+#<B><FONT COLOR="#5F9EA0">else</FONT></B>
+    PII item = make_pair(v[i], i);
+    <B><FONT COLOR="#5F9EA0">VPII</FONT></B>::iterator it = upper_bound(best.begin(), best.end(), item);
+#<B><FONT COLOR="#5F9EA0">endif</FONT></B>
+    <B><FONT COLOR="#A020F0">if</FONT></B> (it == best.end()) {
+      dad[i] = (best.size() == 0 ? -1 : best.back().second);
+      best.push_back(item);
+    } <B><FONT COLOR="#A020F0">else</FONT></B> {
+      dad[i] = dad[it-&gt;second];
+      *it = item;
+    }
+  }
+  
+  VI ret;
+  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i = best.back().second; i &gt;= 0; i = dad[i])
+    ret.push_back(v[i]);
+  reverse(ret.begin(), ret.end());
+  <B><FONT COLOR="#A020F0">return</FONT></B> ret;
+}
+</PRE>
+<HR>
+<A NAME="file29">
+<H1>code/Dates.cc 29/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file28">prev</A>][<A HREF="#file30">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">// Routines for performing computations on dates.  In these routines,
+</FONT></I><I><FONT COLOR="#B22222">// months are expressed as integers from 1 to 12, days are expressed
+</FONT></I><I><FONT COLOR="#B22222">// as integers from 1 to 31, and years are expressed as 4-digit
+</FONT></I><I><FONT COLOR="#B22222">// integers.
+</FONT></I>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;string&gt;</FONT></B>
+
+using namespace std;
+
+string dayOfWeek[] = {<B><FONT COLOR="#BC8F8F">&quot;Mon&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Tue&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Wed&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Thu&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Fri&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Sat&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;Sun&quot;</FONT></B>};
+
+<I><FONT COLOR="#B22222">// converts Gregorian date to integer (Julian day number)
+</FONT></I><B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">dateToInt</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> m, <B><FONT COLOR="#228B22">int</FONT></B> d, <B><FONT COLOR="#228B22">int</FONT></B> y){  
+  <B><FONT COLOR="#A020F0">return</FONT></B> 
+    1461 * (y + 4800 + (m - 14) / 12) / 4 +
+    367 * (m - 2 - (m - 14) / 12 * 12) / 12 - 
+    3 * ((y + 4900 + (m - 14) / 12) / 100) / 4 + 
+    d - 32075;
+}
+
+<I><FONT COLOR="#B22222">// converts integer (Julian day number) to Gregorian date: month/day/year
+</FONT></I><B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#0000FF">intToDate</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> jd, <B><FONT COLOR="#228B22">int</FONT></B> &amp;m, <B><FONT COLOR="#228B22">int</FONT></B> &amp;d, <B><FONT COLOR="#228B22">int</FONT></B> &amp;y){
+  <B><FONT COLOR="#228B22">int</FONT></B> x, n, i, j;
+  
+  x = jd + 68569;
+  n = 4 * x / 146097;
+  x -= (146097 * n + 3) / 4;
+  i = (4000 * (x + 1)) / 1461001;
+  x -= 1461 * i / 4 - 31;
+  j = 80 * x / 2447;
+  d = x - 2447 * j / 80;
+  x = j / 11;
+  m = j + 2 - 12 * x;
+  y = 100 * (n - 49) + i + x;
+}
+
+<I><FONT COLOR="#B22222">// converts integer (Julian day number) to day of week
+</FONT></I>string <B><FONT COLOR="#0000FF">intToDay</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> jd){
+  <B><FONT COLOR="#A020F0">return</FONT></B> dayOfWeek[jd % 7];
+}
+
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B> **argv){
+  <B><FONT COLOR="#228B22">int</FONT></B> jd = dateToInt (3, 24, 2004);
+  <B><FONT COLOR="#228B22">int</FONT></B> m, d, y;
+  intToDate (jd, m, d, y);
+  string day = intToDay (jd);
+  
+  <I><FONT COLOR="#B22222">// expected output:
+</FONT></I>  <I><FONT COLOR="#B22222">//    2453089
+</FONT></I>  <I><FONT COLOR="#B22222">//    3/24/2004
+</FONT></I>  <I><FONT COLOR="#B22222">//    Wed
+</FONT></I>  cout &lt;&lt; jd &lt;&lt; endl
+    &lt;&lt; m &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;/&quot;</FONT></B> &lt;&lt; d &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;/&quot;</FONT></B> &lt;&lt; y &lt;&lt; endl
+    &lt;&lt; day &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file30">
+<H1>code/LogLan.java 30/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file29">prev</A>][<A HREF="#file31">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">// Code which demonstrates the use of Java's regular expression libraries.
+</FONT></I><I><FONT COLOR="#B22222">// This is a solution for 
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">//   Loglan: a logical language
+</FONT></I><I><FONT COLOR="#B22222">//   http://acm.uva.es/p/v1/134.html
+</FONT></I><I><FONT COLOR="#B22222">//
+</FONT></I><I><FONT COLOR="#B22222">// In this problem, we are given a regular language, whose rules can be
+</FONT></I><I><FONT COLOR="#B22222">// inferred directly from the code.  For each sentence in the input, we must
+</FONT></I><I><FONT COLOR="#B22222">// determine whether the sentence matches the regular expression or not.  The
+</FONT></I><I><FONT COLOR="#B22222">// code consists of (1) building the regular expression (which is fairly
+</FONT></I><I><FONT COLOR="#B22222">// complex) and (2) using the regex to match sentences.
+</FONT></I>
+<B><FONT COLOR="#A020F0">import</FONT></B> java.util.*;
+<B><FONT COLOR="#A020F0">import</FONT></B> java.util.regex.*;
+
+<B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">class</FONT></B> LogLan {
+
+    <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> String BuildRegex (){
+	String space = <B><FONT COLOR="#BC8F8F">&quot; +&quot;</FONT></B>;
+
+	String A = <B><FONT COLOR="#BC8F8F">&quot;([aeiou])&quot;</FONT></B>;
+	String C = <B><FONT COLOR="#BC8F8F">&quot;([a-z&amp;&amp;[^aeiou]])&quot;</FONT></B>;
+	String MOD = <B><FONT COLOR="#BC8F8F">&quot;(g&quot;</FONT></B> + A + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String BA = <B><FONT COLOR="#BC8F8F">&quot;(b&quot;</FONT></B> + A + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String DA = <B><FONT COLOR="#BC8F8F">&quot;(d&quot;</FONT></B> + A + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String LA = <B><FONT COLOR="#BC8F8F">&quot;(l&quot;</FONT></B> + A + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String NAM = <B><FONT COLOR="#BC8F8F">&quot;([a-z]*&quot;</FONT></B> + C + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String PREDA = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + C + C + A + C + A + <B><FONT COLOR="#BC8F8F">&quot;|&quot;</FONT></B> + C + A + C + C + A + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+
+	String predstring = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + PREDA + <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + space + PREDA + <B><FONT COLOR="#BC8F8F">&quot;)*)&quot;</FONT></B>;
+	String predname = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + LA + space + predstring + <B><FONT COLOR="#BC8F8F">&quot;|&quot;</FONT></B> + NAM + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String preds = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + predstring + <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + space + A + space + predstring + <B><FONT COLOR="#BC8F8F">&quot;)*)&quot;</FONT></B>;
+	String predclaim = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + predname + space + BA + space + preds + <B><FONT COLOR="#BC8F8F">&quot;|&quot;</FONT></B> + DA + space +
+            preds + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String verbpred = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + MOD + space + predstring + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String statement = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + predname + space + verbpred + space + predname + <B><FONT COLOR="#BC8F8F">&quot;|&quot;</FONT></B> + 
+            predname + space + verbpred + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+	String sentence = <B><FONT COLOR="#BC8F8F">&quot;(&quot;</FONT></B> + statement + <B><FONT COLOR="#BC8F8F">&quot;|&quot;</FONT></B> + predclaim + <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B>;
+
+	<B><FONT COLOR="#A020F0">return</FONT></B> <B><FONT COLOR="#BC8F8F">&quot;^&quot;</FONT></B> + sentence + <B><FONT COLOR="#BC8F8F">&quot;$&quot;</FONT></B>;
+    }
+
+    <B><FONT COLOR="#A020F0">public</FONT></B> <B><FONT COLOR="#A020F0">static</FONT></B> <B><FONT COLOR="#A020F0">void</FONT></B> main (String args[]){
+
+	String regex = BuildRegex();
+	Pattern pattern = Pattern.compile (regex);
+	
+	Scanner s = <B><FONT COLOR="#A020F0">new</FONT></B> Scanner(System.in);
+	<B><FONT COLOR="#A020F0">while</FONT></B> (<B><FONT COLOR="#A020F0">true</FONT></B>) {
+
+            <I><FONT COLOR="#B22222">// In this problem, each sentence consists of multiple lines, where the last 
+</FONT></I>	    <I><FONT COLOR="#B22222">// line is terminated by a period.  The code below reads lines until
+</FONT></I>	    <I><FONT COLOR="#B22222">// encountering a line whose final character is a '.'.  Note the use of
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.length() to get length of string
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.charAt() to extract characters from a Java string
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.trim() to remove whitespace from the beginning and end of Java string
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">// Other useful String manipulation methods include
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.compareTo(t) &lt; 0 if s &lt; t, lexicographically
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.indexOf(&quot;apple&quot;) returns index of first occurrence of &quot;apple&quot; in s
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.lastIndexOf(&quot;apple&quot;) returns index of last occurrence of &quot;apple&quot; in s
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.replace(c,d) replaces occurrences of character c with d
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.startsWith(&quot;apple) returns (s.indexOf(&quot;apple&quot;) == 0)
+</FONT></I>            <I><FONT COLOR="#B22222">//    s.toLowerCase() / s.toUpperCase() returns a new lower/uppercased string
+</FONT></I>            <I><FONT COLOR="#B22222">//
+</FONT></I>            <I><FONT COLOR="#B22222">//    Integer.parseInt(s) converts s to an integer (32-bit)
+</FONT></I>            <I><FONT COLOR="#B22222">//    Long.parseLong(s) converts s to a long (64-bit)
+</FONT></I>            <I><FONT COLOR="#B22222">//    Double.parseDouble(s) converts s to a double
+</FONT></I>            
+	    String sentence = <B><FONT COLOR="#BC8F8F">&quot;&quot;</FONT></B>;
+	    <B><FONT COLOR="#A020F0">while</FONT></B> (<B><FONT COLOR="#A020F0">true</FONT></B>){
+		sentence = (sentence + <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> + s.nextLine()).trim();
+		<B><FONT COLOR="#A020F0">if</FONT></B> (sentence.equals(<B><FONT COLOR="#BC8F8F">&quot;#&quot;</FONT></B>)) <B><FONT COLOR="#A020F0">return</FONT></B>;
+		<B><FONT COLOR="#A020F0">if</FONT></B> (sentence.charAt(sentence.length()-1) == <B><FONT COLOR="#BC8F8F">'.'</FONT></B>) <B><FONT COLOR="#A020F0">break</FONT></B>;		
+	    }
+
+            <I><FONT COLOR="#B22222">// now, we remove the period, and match the regular expression
+</FONT></I>
+            String removed_period = sentence.substring(0, sentence.length()-1).trim();
+	    <B><FONT COLOR="#A020F0">if</FONT></B> (pattern.matcher (removed_period).find()){
+		System.out.println (<B><FONT COLOR="#BC8F8F">&quot;Good&quot;</FONT></B>);
+	    } <B><FONT COLOR="#A020F0">else</FONT></B> {
+		System.out.println (<B><FONT COLOR="#BC8F8F">&quot;Bad!&quot;</FONT></B>);
+	    }
+	}
+    }
+}
+</PRE>
+<HR>
+<A NAME="file31">
+<H1>code/Primes.cc 31/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file30">prev</A>][<A HREF="#file32">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">// O(sqrt(x)) Exhaustive Primality Test
+</FONT></I>#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;cmath&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">define</FONT></B> <FONT COLOR="#B8860B">EPS</FONT> 1e-7
+<B><FONT COLOR="#228B22">typedef</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> <B><FONT COLOR="#228B22">long</FONT></B> LL;
+<B><FONT COLOR="#228B22">bool</FONT></B> <B><FONT COLOR="#0000FF">IsPrimeSlow</FONT></B> (LL x)
+{
+  <B><FONT COLOR="#A020F0">if</FONT></B>(x&lt;=1) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  <B><FONT COLOR="#A020F0">if</FONT></B>(x&lt;=3) <B><FONT COLOR="#A020F0">return</FONT></B> true;
+  <B><FONT COLOR="#A020F0">if</FONT></B> (!(x%2) || !(x%3)) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  LL s=(LL)(sqrt((<B><FONT COLOR="#228B22">double</FONT></B>)(x))+EPS);
+  <B><FONT COLOR="#A020F0">for</FONT></B>(LL i=5;i&lt;=s;i+=6)
+  {
+    <B><FONT COLOR="#A020F0">if</FONT></B> (!(x%i) || !(x%(i+2))) <B><FONT COLOR="#A020F0">return</FONT></B> false;
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> true;
+}
+<I><FONT COLOR="#B22222">// Primes less than 1000:
+</FONT></I><I><FONT COLOR="#B22222">//      2     3     5     7    11    13    17    19    23    29    31    37
+</FONT></I><I><FONT COLOR="#B22222">//     41    43    47    53    59    61    67    71    73    79    83    89
+</FONT></I><I><FONT COLOR="#B22222">//     97   101   103   107   109   113   127   131   137   139   149   151
+</FONT></I><I><FONT COLOR="#B22222">//    157   163   167   173   179   181   191   193   197   199   211   223
+</FONT></I><I><FONT COLOR="#B22222">//    227   229   233   239   241   251   257   263   269   271   277   281
+</FONT></I><I><FONT COLOR="#B22222">//    283   293   307   311   313   317   331   337   347   349   353   359
+</FONT></I><I><FONT COLOR="#B22222">//    367   373   379   383   389   397   401   409   419   421   431   433
+</FONT></I><I><FONT COLOR="#B22222">//    439   443   449   457   461   463   467   479   487   491   499   503
+</FONT></I><I><FONT COLOR="#B22222">//    509   521   523   541   547   557   563   569   571   577   587   593
+</FONT></I><I><FONT COLOR="#B22222">//    599   601   607   613   617   619   631   641   643   647   653   659
+</FONT></I><I><FONT COLOR="#B22222">//    661   673   677   683   691   701   709   719   727   733   739   743
+</FONT></I><I><FONT COLOR="#B22222">//    751   757   761   769   773   787   797   809   811   821   823   827
+</FONT></I><I><FONT COLOR="#B22222">//    829   839   853   857   859   863   877   881   883   887   907   911
+</FONT></I><I><FONT COLOR="#B22222">//    919   929   937   941   947   953   967   971   977   983   991   997
+</FONT></I>
+<I><FONT COLOR="#B22222">// Other primes:
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10 is 7.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100 is 97.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000 is 997.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000 is 9973.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000 is 99991.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000 is 999983.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000 is 9999991.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000 is 99999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000 is 999999937.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000 is 9999999967.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000 is 99999999977.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000 is 999999999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000000 is 9999999999971.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000000 is 99999999999973.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000000 is 999999999999989.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 10000000000000000 is 9999999999999937.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 100000000000000000 is 99999999999999997.
+</FONT></I><I><FONT COLOR="#B22222">//    The largest prime smaller than 1000000000000000000 is 999999999999999989.
+</FONT></I></PRE>
+<HR>
+<A NAME="file32">
+<H1>code/IO.cc 32/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file31">prev</A>][<A HREF="#file33">next</A>]
+<PRE>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iomanip&gt;</FONT></B>
+
+using namespace std;
+
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+    <I><FONT COLOR="#B22222">// Ouput a specific number of digits past the decimal point,
+</FONT></I>    <I><FONT COLOR="#B22222">// in this case 5    
+</FONT></I>    cout.setf(ios::fixed); cout &lt;&lt; setprecision(5);
+    cout &lt;&lt; 100.0/7.0 &lt;&lt; endl;
+    cout.unsetf(ios::fixed);
+    
+    <I><FONT COLOR="#B22222">// Output the decimal point and trailing zeros
+</FONT></I>    cout.setf(ios::showpoint);
+    cout &lt;&lt; 100.0 &lt;&lt; endl;
+    cout.unsetf(ios::showpoint);
+    
+    <I><FONT COLOR="#B22222">// Output a '+' before positive values
+</FONT></I>    cout.setf(ios::showpos);
+    cout &lt;&lt; 100 &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; -100 &lt;&lt; endl;
+    cout.unsetf(ios::showpos);
+    
+    <I><FONT COLOR="#B22222">// Output numerical values in hexadecimal
+</FONT></I>    cout &lt;&lt; hex &lt;&lt; 100 &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; 1000 &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; 10000 &lt;&lt; dec &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file33">
+<H1>code/KMP.cc 33/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file32">prev</A>][<A HREF="#file34">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">/*
+Finds all occurrences of the pattern string p within the
+text string t. Running time is O(n + m), where n and m
+are the lengths of p and t, respecitvely.
+*/</FONT></I>
+
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;string&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;vector&gt;</FONT></B>
+
+using namespace std;
+
+<B><FONT COLOR="#228B22">typedef</FONT></B> vector&lt;<B><FONT COLOR="#228B22">int</FONT></B>&gt; VI;
+
+<B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#0000FF">buildPi</FONT></B>(string&amp; p, VI&amp; pi)
+{
+  pi = VI(p.length());
+  <B><FONT COLOR="#228B22">int</FONT></B> k = -2;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; p.length(); i++) {
+    <B><FONT COLOR="#A020F0">while</FONT></B>(k &gt;= -1 &amp;&amp; p[k+1] != p[i])
+      k = (k == -1) ? -2 : pi[k];
+    pi[i] = ++k;
+  }
+}
+
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">KMP</FONT></B>(string&amp; t, string&amp; p)
+{
+  VI pi;
+  buildPi(p, pi);
+  <B><FONT COLOR="#228B22">int</FONT></B> k = -1;
+  <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; t.length(); i++) {
+    <B><FONT COLOR="#A020F0">while</FONT></B>(k &gt;= -1 &amp;&amp; p[k+1] != t[i])
+      k = (k == -1) ? -2 : pi[k];
+    k++;
+    <B><FONT COLOR="#A020F0">if</FONT></B>(k == p.length() - 1) {
+      <I><FONT COLOR="#B22222">// p matches t[i-m+1, ..., i]
+</FONT></I>      cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;matched at index &quot;</FONT></B> &lt;&lt; i-k &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;: &quot;</FONT></B>;
+      cout &lt;&lt; t.substr(i-k, p.length()) &lt;&lt; endl;
+      k = (k == -1) ? -2 : pi[k];
+    }
+  }
+  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+  string a = <B><FONT COLOR="#BC8F8F">&quot;AABAACAADAABAABA&quot;</FONT></B>, b = <B><FONT COLOR="#BC8F8F">&quot;AABA&quot;</FONT></B>;
+  KMP(a, b); <I><FONT COLOR="#B22222">// expected matches at: 0, 9, 12
+</FONT></I>  <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+}
+</PRE>
+<HR>
+<A NAME="file34">
+<H1>code/LatLong.cc 34/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file33">prev</A>][<A HREF="#file35">next</A>]
+<PRE>
+<I><FONT COLOR="#B22222">/*
+Converts from rectangular coordinates to latitude/longitude and vice
+versa. Uses degrees (not radians).
+*/</FONT></I>
+
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;iostream&gt;</FONT></B>
+#<B><FONT COLOR="#5F9EA0">include</FONT></B> <B><FONT COLOR="#BC8F8F">&lt;cmath&gt;</FONT></B>
+
+using namespace std;
+
+<B><FONT COLOR="#228B22">struct</FONT></B> ll
+{
+  <B><FONT COLOR="#228B22">double</FONT></B> r, lat, lon;
+};
+
+<B><FONT COLOR="#228B22">struct</FONT></B> rect
+{
+  <B><FONT COLOR="#228B22">double</FONT></B> x, y, z;
+};
+
+ll <B><FONT COLOR="#0000FF">convert</FONT></B>(rect&amp; P)
+{
+  ll Q;
+  Q.r = sqrt(P.x*P.x+P.y*P.y+P.z*P.z);
+  Q.lat = 180/M_PI*asin(P.z/Q.r);
+  Q.lon = 180/M_PI*acos(P.x/sqrt(P.x*P.x+P.y*P.y));
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> Q;
+}
+
+rect <B><FONT COLOR="#0000FF">convert</FONT></B>(ll&amp; Q)
+{
+  rect P;
+  P.x = Q.r*cos(Q.lon*M_PI/180)*cos(Q.lat*M_PI/180);
+  P.y = Q.r*sin(Q.lon*M_PI/180)*cos(Q.lat*M_PI/180);
+  P.z = Q.r*sin(Q.lat*M_PI/180);
+  
+  <B><FONT COLOR="#A020F0">return</FONT></B> P;
+}
+
+<B><FONT COLOR="#228B22">int</FONT></B> <B><FONT COLOR="#0000FF">main</FONT></B>()
+{
+  rect A;
+  ll B;
+  
+  A.x = -1.0; A.y = 2.0; A.z = -3.0;
+  
+  B = convert(A);
+  cout &lt;&lt; B.r &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; B.lat &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; B.lon &lt;&lt; endl;
+  
+  A = convert(B);
+  cout &lt;&lt; A.x &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; A.y &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; A.z &lt;&lt; endl;
+}
+</PRE>
+<HR>
+<A NAME="file35">
+<H1>code/EmacsSettings.txt 35/35</H1>
+[<A HREF="#top">top</A>][<A HREF="#file34">prev</A>][next]
+<PRE>
+;; Jack's .emacs file
+
+(global-set-key &quot;\C-z&quot;	    'scroll-down)
+(global-set-key &quot;\C-x\C-p&quot;  '(lambda() (interactive) (other-window -1)) )
+(global-set-key &quot;\C-x\C-o&quot;  'other-window)
+(global-set-key &quot;\C-x\C-n&quot;  'other-window)
+(global-set-key &quot;\M-.&quot;      'end-of-buffer)
+(global-set-key &quot;\M-,&quot;      'beginning-of-buffer)
+(global-set-key &quot;\M-g&quot;      'goto-line)
+(global-set-key &quot;\C-c\C-w&quot;  'compare-windows)
+
+(tool-bar-mode 0)
+(scroll-bar-mode -1)
+
+(global-font-lock-mode 1)
+(show-paren-mode 1)
+
+(setq-default c-default-style &quot;linux&quot;)
+
+(custom-set-variables
+ '(compare-ignore-whitespace t)
+)
 </PRE>
 <HR>
 <ADDRESS>Generated by <A HREF="http://www.iki.fi/~mtr/genscript/">GNU Enscript 1.6.5.90</A>.</ADDRESS>
