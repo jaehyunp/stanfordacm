@@ -22,7 +22,7 @@ def get_sections():
                     raise ValueError('Subsection parse error: %s' % line)
                 filename = tmp[0]
                 subsection_name = tmp[1]
-                if subsection_name is None:
+                if section_name is None:
                     raise ValueError('Subsection given without section')
                 subsections.append((filename, subsection_name))
     return sections
