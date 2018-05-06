@@ -36,9 +36,9 @@ struct Dinic {
 
   void AddEdge(int u, int v, LL cap) {
     if (u != v) {
-      E.emplace_back(Edge(u, v, cap));
+      E.emplace_back(u, v, cap);
       g[u].emplace_back(E.size() - 1);
-      E.emplace_back(Edge(v, u, 0));
+      E.emplace_back(v, u, 0);
       g[v].emplace_back(E.size() - 1);
     }
   }
