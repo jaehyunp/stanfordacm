@@ -53,13 +53,13 @@ int extended_euclid(int a, int b, int &x, int &y) {
 	return a;
 }
 
-// finds all solutions to ax = b (mod n)
+// finds all solutions to ax = b (mod n) in ascending order
 VI modular_linear_equation_solver(int a, int b, int n) {
 	int x, y;
 	VI ret;
 	int g = extended_euclid(a, n, x, y);
 	if (!(b%g)) {
-		x = mod(x*(b / g), n);
+		x = mod(mod(x*(b / g), n), n / g);
 		for (int i = 0; i < g; i++)
 			ret.push_back(mod(x + i*(n / g), n));
 	}
